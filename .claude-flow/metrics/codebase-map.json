@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-01-21T01:19:49.583Z",
-  "projectRoot": "/home/user/marketing",
+  "timestamp": "2026-03-24T19:36:59.030Z",
+  "projectRoot": "/home/user/aas",
   "structure": {
     "hasPackageJson": true,
     "hasTsConfig": true,
     "hasClaudeConfig": true,
     "hasClaudeFlow": true
   },
-  "scannedAt": 1768958389584
+  "scannedAt": 1774381019031
 }

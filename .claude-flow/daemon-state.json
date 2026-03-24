@@ -1,50 +1,51 @@
 {
   "running": true,
-  "startedAt": "2026-01-21T01:19:49.579Z",
+  "startedAt": "2026-03-24T19:36:59.028Z",
   "workers": {
     "map": {
-      "runCount": 3,
-      "successCount": 3,
+      "runCount": 4,
+      "successCount": 4,
       "failureCount": 0,
-      "averageDurationMs": 1.3333333333333333,
-      "lastRun": "2026-01-21T01:19:49.584Z",
-      "nextRun": "2026-01-21T01:34:49.585Z",
+      "averageDurationMs": 1.25,
+      "lastRun": "2026-03-24T19:36:59.031Z",
+      "nextRun": "2026-03-24T19:51:59.031Z",
       "isRunning": false
     },
     "audit": {
-      "runCount": 2,
-      "successCount": 0,
+      "runCount": 3,
+      "successCount": 1,
       "failureCount": 2,
-      "averageDurationMs": 0,
-      "lastRun": "2026-01-21T01:26:49.583Z",
-      "nextRun": "2026-01-21T01:36:49.583Z",
+      "averageDurationMs": 31248.333333333332,
+      "lastRun": "2026-03-24T19:40:32.858Z",
+      "nextRun": "2026-03-24T19:50:32.858Z",
       "isRunning": false
     },
     "optimize": {
-      "runCount": 2,
-      "successCount": 0,
+      "runCount": 3,
+      "successCount": 1,
       "failureCount": 2,
-      "averageDurationMs": 0,
-      "lastRun": "2026-01-21T01:28:49.580Z",
-      "nextRun": "2026-01-21T01:23:49.579Z",
+      "averageDurationMs": 15574.333333333334,
+      "lastRun": "2026-03-24T19:41:45.779Z",
+      "nextRun": "2026-03-24T19:56:45.779Z",
       "isRunning": false
     },
     "consolidate": {
-      "runCount": 2,
-      "successCount": 2,
+      "runCount": 3,
+      "successCount": 3,
       "failureCount": 0,
       "averageDurationMs": 1,
-      "lastRun": "2026-01-21T01:26:49.586Z",
-      "nextRun": "2026-01-21T01:55:49.580Z",
+      "lastRun": "2026-03-24T19:42:59.103Z",
+      "nextRun": "2026-03-24T20:12:59.104Z",
       "isRunning": false
     },
     "testgaps": {
-      "runCount": 0,
-      "successCount": 0,
+      "runCount": 1,
+      "successCount": 1,
       "failureCount": 0,
-      "averageDurationMs": 0,
-      "nextRun": "2026-01-21T01:27:49.579Z",
-      "isRunning": true
+      "averageDurationMs": 46086,
+      "lastRun": "2026-03-24T19:45:45.134Z",
+      "nextRun": "2026-03-24T19:44:59.029Z",
+      "isRunning": false
     },
     "predict": {
       "runCount": 0,
@@ -63,8 +64,8 @@
   },
   "config": {
     "autoStart": false,
-    "logDir": "/home/user/marketing/.claude-flow/logs",
-    "stateFile": "/home/user/marketing/.claude-flow/daemon-state.json",
+    "logDir": "/home/user/aas/.claude-flow/logs",
+    "stateFile": "/home/user/aas/.claude-flow/daemon-state.json",
     "maxConcurrent": 2,
     "workerTimeoutMs": 300000,
     "resourceThresholds": {
@@ -130,5 +131,5 @@
       }
     ]
   },
-  "savedAt": "2026-01-21T01:28:49.580Z"
+  "savedAt": "2026-03-24T19:45:45.134Z"
 }
