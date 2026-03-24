@@ -1,0 +1,116 @@
+{
+  "platform": "tiktok",
+  "campaignId": "flowai-launch-2026",
+
+  "videos": [
+    {
+      "id": "tt-teaser-1",
+      "phase": "teaser",
+      "duration": 15,
+      "hook": "POV: you just found the app that replaces 9 others",
+      "body": "[Show phone screen with 9 app icons] These are the apps I used to switch between every day. [Swipe to clean home screen with just FlowAI] Now I use one.",
+      "cta": "Follow to find out what it is. Dropping it next week.",
+      "soundSuggestion": "Oh No - Kreepa (sped up)",
+      "hashtags": ["productivity", "techtok", "lifehack", "fyp"],
+      "textOverlays": [
+        "9 apps → 1 app",
+        "What if I told you...",
+        "Reveal next week 👀"
+      ],
+      "transitions": ["swipe left"]
+    },
+    {
+      "id": "tt-teaser-2",
+      "phase": "teaser",
+      "duration": 30,
+      "hook": "STOP using 5 apps to manage your work. Here's why.",
+      "body": "[Face to camera] Every time you switch apps, your brain takes 23 minutes to refocus. That's not me saying that — that's a UC Irvine study. [Cut to screen recording] I used to switch between Notion, Todoist, Google Calendar, Slack, and Linear. Every. Single. Day. [Cut back to face] I found something that changed everything. And I'm revealing it in 3 days.",
+      "cta": "Follow so you don't miss it. Drop a 🧠 if you're tired of app switching.",
+      "soundSuggestion": "Original sound - ambient motivation",
+      "hashtags": ["productivity", "techtok", "workfromhome", "ai", "fyp"],
+      "textOverlays": [
+        "23 min to refocus after every switch",
+        "That's 3.5 hours LOST per day",
+        "The solution drops in 3 days..."
+      ],
+      "transitions": ["jump cut", "text reveal"]
+    },
+    {
+      "id": "tt-launch-1",
+      "phase": "launch",
+      "duration": 60,
+      "hook": "This AI app just auto-planned my entire week. Watch.",
+      "body": "[Screen recording] I'm going to open FlowAI and show you what happens. [Shows app opening to daily view] See this? It already knows my meetings, my deadlines, and my energy patterns. [Shows auto-generated schedule] It planned focus blocks around my meetings, prioritized my tasks by impact, and left buffer time. [Shows a meeting being moved] Now watch — I just moved this 2pm meeting to 4pm. [Shows schedule auto-adjusting] Boom. Everything reshuffled. No manual work.",
+      "cta": "Link in bio to try it free. This is genuinely the future of productivity.",
+      "soundSuggestion": "Aesthetic tech / corporate motivational",
+      "hashtags": ["FlowAI", "ai", "productivity", "techtok", "fyp", "techreview"],
+      "textOverlays": [
+        "Watch this AI plan my week",
+        "Auto-scheduled around meetings",
+        "Moved one meeting → everything updated",
+        "Try free → link in bio"
+      ],
+      "transitions": ["jump cut", "zoom in", "text reveal"]
+    },
+    {
+      "id": "tt-launch-2",
+      "phase": "launch",
+      "duration": 15,
+      "hook": "Using an AI assistant that actually works",
+      "body": "[Quick cuts of: opening app → seeing auto-planned day → checking off task → schedule auto-adjusting → weekly report appearing] All automatic. Zero planning time.",
+      "cta": "FlowAI. Link in bio.",
+      "soundSuggestion": "Trending viral sound (check Discover)",
+      "hashtags": ["FlowAI", "productivity", "ai", "fyp"],
+      "textOverlays": [
+        "Auto-plan ✓",
+        "Auto-adjust ✓",
+        "Auto-report ✓",
+        "FlowAI → link in bio"
+      ],
+      "transitions": ["rapid jump cuts"]
+    },
+    {
+      "id": "tt-proof-1",
+      "phase": "social_proof",
+      "duration": 30,
+      "hook": "I tracked my productivity for 30 days with and without FlowAI. Here are the actual numbers.",
+      "body": "[Show split screen comparison] Left side: without FlowAI — 4.5 hours average productive time per day. Right side: with FlowAI — 7.2 hours. [Show time saved graphic] That's 2.7 extra hours. Every day. [Face to camera] I didn't work harder. I just stopped wasting time organizing my work.",
+      "cta": "Comment 'FLOW' and I'll send you the full breakdown. Link in bio to try it.",
+      "soundSuggestion": "Money - Cardi B (slowed)",
+      "hashtags": ["FlowAI", "productivity", "ai", "techtok", "results", "fyp"],
+      "textOverlays": [
+        "30-day experiment",
+        "Without: 4.5 hrs/day",
+        "With FlowAI: 7.2 hrs/day",
+        "+2.7 hours DAILY"
+      ],
+      "transitions": ["split screen", "text reveal", "jump cut"]
+    }
+  ],
+
+  "duetIdeas": [
+    {
+      "description": "Duet with productivity creators showing their complex setup, then show FlowAI simplifying it",
+      "hook": "This could be one app though..."
+    },
+    {
+      "description": "Duet with 'morning routine' videos, showing FlowAI auto-planning the day",
+      "hook": "While you're doing all that, my AI already planned my day"
+    }
+  ],
+
+  "responseVideoIdeas": [
+    {
+      "triggerComment": "Does it actually work?",
+      "response": "Full screen recording of a real work day using only FlowAI"
+    },
+    {
+      "triggerComment": "How is this different from Notion AI?",
+      "response": "Side by side: Notion AI suggests text edits. FlowAI runs your entire workflow."
+    },
+    {
+      "triggerComment": "Show the weekly report",
+      "response": "Full walkthrough of auto-generated weekly productivity report"
+    }
+  ]
+}

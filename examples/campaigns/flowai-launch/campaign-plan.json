@@ -1,0 +1,82 @@
+{
+  "id": "flowai-launch-2026",
+  "name": "FlowAI Product Launch",
+  "description": "3-week social media campaign to launch FlowAI — an AI productivity assistant — across X and TikTok",
+  "platforms": ["x", "tiktok"],
+  "startDate": "2026-04-07",
+  "endDate": "2026-04-27",
+  "status": "draft",
+
+  "targetAudience": {
+    "demographics": {
+      "ageRange": [22, 40],
+      "interests": ["productivity", "AI tools", "tech", "startups", "remote work"],
+      "locations": ["US", "UK", "CA", "AU"]
+    },
+    "psychographics": {
+      "painPoints": [
+        "Too many apps to manage tasks",
+        "Context switching kills focus",
+        "AI tools are confusing or overhyped",
+        "Want to be productive but feel overwhelmed"
+      ],
+      "aspirations": [
+        "10x their output",
+        "Look cutting-edge to peers",
+        "Simplify their workflow",
+        "Get promoted / grow their business"
+      ],
+      "contentPreferences": ["video", "thread", "text"]
+    }
+  },
+
+  "contentPillars": [
+    "The Problem — Why current productivity tools fail",
+    "The Solution — How FlowAI is different",
+    "Social Proof — Early adopter results",
+    "Behind the Scenes — Building FlowAI",
+    "Tips & Value — Productivity hacks (powered by FlowAI)"
+  ],
+
+  "phases": [
+    {
+      "phase": "teaser",
+      "startDay": 0,
+      "endDay": 6,
+      "postsPerDay": { "x": 3, "tiktok": 2 },
+      "focus": "Build curiosity. Hint at the problem. Don't reveal the product yet."
+    },
+    {
+      "phase": "launch",
+      "startDay": 7,
+      "endDay": 13,
+      "postsPerDay": { "x": 4, "tiktok": 3 },
+      "focus": "Reveal FlowAI. Demo features. Drive signups."
+    },
+    {
+      "phase": "social_proof",
+      "startDay": 14,
+      "endDay": 20,
+      "postsPerDay": { "x": 3, "tiktok": 2 },
+      "focus": "Share early adopter wins. Testimonials. Results."
+    }
+  ],
+
+  "kpis": {
+    "targetImpressions": 2000000,
+    "targetEngagementRate": 0.045,
+    "targetFollowerGrowth": 5000,
+    "targetClicks": 25000,
+    "targetVideoViews": 500000
+  },
+
+  "budget": {
+    "organic": true,
+    "paidBoost": 2000,
+    "currency": "USD",
+    "allocation": {
+      "x": 0.4,
+      "tiktok": 0.6
+    }
+  }
+}

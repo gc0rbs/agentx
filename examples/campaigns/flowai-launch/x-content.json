@@ -1,0 +1,139 @@
+{
+  "platform": "x",
+  "campaignId": "flowai-launch-2026",
+
+  "tweets": [
+    {
+      "id": "x-teaser-1",
+      "phase": "teaser",
+      "format": "text",
+      "text": "I've been testing something for the past 3 months that completely changed how I work.\n\nNot another to-do app.\nNot another Notion template.\n\nSomething different. Revealing it next week.",
+      "hashtags": ["productivity", "ai"],
+      "style": "storytelling"
+    },
+    {
+      "id": "x-teaser-2",
+      "phase": "teaser",
+      "format": "poll",
+      "text": "How many productivity apps are you currently juggling?",
+      "pollOptions": ["1-2 (minimalist)", "3-5 (normal chaos)", "6-10 (send help)", "10+ (professional tab hoarder)"],
+      "pollDuration": 24,
+      "hashtags": ["productivity"]
+    },
+    {
+      "id": "x-teaser-3",
+      "phase": "teaser",
+      "format": "text",
+      "text": "The average knowledge worker switches between 9 apps per day.\n\nEach switch costs 23 minutes of focus.\n\nThat's 3.5 hours lost. Every. Single. Day.\n\nWhat if one tool could fix that?",
+      "hashtags": ["remotework", "productivity"],
+      "style": "informative"
+    },
+    {
+      "id": "x-launch-1",
+      "phase": "launch",
+      "format": "text",
+      "text": "Introducing FlowAI ✨\n\nOne AI assistant that replaces your task manager, note-taker, calendar, and project tracker.\n\nIt doesn't just organize your work — it does your work.\n\nEarly access is live → flowai.app",
+      "hashtags": ["FlowAI", "ai", "productivity"],
+      "style": "informative"
+    },
+    {
+      "id": "x-launch-2",
+      "phase": "launch",
+      "format": "text",
+      "text": "\"Just use a to-do list\"\n\nSure. And I'll just remember everything, never miss a deadline, and manually update 5 apps every time something changes.\n\nOr... I'll let FlowAI handle it. Your call.",
+      "hashtags": ["FlowAI"],
+      "style": "provocative"
+    },
+    {
+      "id": "x-launch-3",
+      "phase": "launch",
+      "format": "text",
+      "text": "FlowAI just auto-rescheduled my entire week because one meeting moved.\n\nTasks, deadlines, focus blocks — all updated.\n\nI didn't touch a thing.\n\nThis is what AI productivity actually looks like.",
+      "hashtags": ["FlowAI", "ai"],
+      "style": "storytelling"
+    },
+    {
+      "id": "x-launch-4",
+      "phase": "launch",
+      "format": "text",
+      "text": "FlowAI in 30 seconds:\n\n→ Tell it your goals\n→ It plans your week\n→ It tracks progress automatically\n→ It reschedules when things change\n→ It learns what works for YOU\n\nNot a template. Not a framework. An actual AI assistant.",
+      "hashtags": ["FlowAI", "productivity"],
+      "style": "listicle"
+    },
+    {
+      "id": "x-proof-1",
+      "phase": "social_proof",
+      "format": "text",
+      "text": "\"I saved 6 hours in my first week with FlowAI. It's not even close to anything else I've tried.\"\n\n— @earlyuser (real beta tester, not a paid shill)\n\n1,200+ people on the waitlist. Early access closing Friday.",
+      "hashtags": ["FlowAI"],
+      "style": "storytelling"
+    },
+    {
+      "id": "x-proof-2",
+      "phase": "social_proof",
+      "format": "text",
+      "text": "FlowAI beta results after 30 days:\n\n• 73% of users report saving 5+ hours/week\n• 91% reduced app switching by half\n• NPS: 72\n\nBuilding in public. These numbers are real.",
+      "hashtags": ["FlowAI", "buildinpublic"],
+      "style": "informative"
+    },
+    {
+      "id": "x-proof-3",
+      "phase": "social_proof",
+      "format": "text",
+      "text": "The #1 question I get about FlowAI:\n\n\"Does it actually work or is it just another AI wrapper?\"\n\nFair question. So I recorded my full workflow for a week.\n\nThread below with real screenshots. Zero cherry-picking. 👇",
+      "hashtags": ["FlowAI", "ai"],
+      "style": "storytelling"
+    }
+  ],
+
+  "threads": [
+    {
+      "id": "x-thread-1",
+      "phase": "launch",
+      "topic": "Why I built FlowAI",
+      "parts": [
+        "Why I built FlowAI — and why existing productivity tools are broken.\n\nA thread 🧵",
+        "1/ I've tried every productivity app. Notion, Todoist, Linear, Asana, ClickUp, Monday, Trello. All of them.\n\nThey all have the same problem: they make YOU do the organizing.",
+        "2/ Think about it. You spend 30 min planning your day. Then something changes. A meeting moves. A priority shifts.\n\nNow your whole plan is stale. And you have to redo it.",
+        "3/ AI should handle this. Not \"AI\" that generates a to-do list once. Actually intelligent automation that adapts in real-time.",
+        "4/ That's FlowAI.\n\n• It watches your calendar, tasks, and goals\n• It builds your day automatically\n• When things change, it restructures\n• It learns your patterns over weeks",
+        "5/ After 3 months of beta testing:\n\nUsers save an average of 5.2 hours per week. Not by working faster — by eliminating the overhead of self-management.",
+        "6/ Early access is open now.\n\nIf you're tired of being your own project manager, try it.\n\n→ flowai.app\n\nRepost the first tweet if this resonated. Follow for more updates."
+      ]
+    },
+    {
+      "id": "x-thread-2",
+      "phase": "social_proof",
+      "topic": "7 workflows FlowAI automates",
+      "parts": [
+        "7 workflows FlowAI automates that used to eat my entire morning.\n\nSave this thread — you'll want to try these 🧵",
+        "1/ Morning planning\n\nBefore: 25 min reviewing tasks, calendar, emails.\nAfter: FlowAI sends me a priority-ranked schedule at 7am. I just start.",
+        "2/ Meeting follow-ups\n\nBefore: Write notes, create tasks, send recaps manually.\nAfter: FlowAI joins the meeting, extracts action items, assigns them.",
+        "3/ Weekly reviews\n\nBefore: Manually compile what I did across 4 apps.\nAfter: Auto-generated report with completions, blockers, and next week's plan.",
+        "4/ Email triage\n\nBefore: Read everything, decide what needs action.\nAfter: FlowAI categorizes, drafts responses, creates tasks from requests.",
+        "5/ Project tracking\n\nBefore: Update status in Linear, Notion, and Slack.\nAfter: One update propagates everywhere. Single source of truth.",
+        "6/ Focus time protection\n\nBefore: Hope nobody schedules over my deep work blocks.\nAfter: FlowAI guards my calendar and suggests optimal focus windows.",
+        "7/ Goal tracking\n\nBefore: Set goals Jan 1, forget by Jan 15.\nAfter: FlowAI breaks goals into weekly milestones and tracks them daily.\n\nTry it → flowai.app"
+      ]
+    }
+  ],
+
+  "replyTemplates": [
+    {
+      "trigger": "price",
+      "reply": "Free tier available! Pro is $12/mo. But honestly, if it saves you 5+ hours a week, the ROI is pretty clear 😄"
+    },
+    {
+      "trigger": "vs notion",
+      "reply": "Notion is great for docs and wikis. FlowAI is for automated task management. They actually pair well together — FlowAI can sync with your Notion workspace."
+    },
+    {
+      "trigger": "how does it work",
+      "reply": "Connect your calendar + task list. FlowAI learns your patterns, auto-plans your day, and adapts when things change. Think of it as a chief of staff that never sleeps."
+    },
+    {
+      "trigger": "waitlist",
+      "reply": "Early access is open now! Skip the waitlist → flowai.app"
+    }
+  ]
+}

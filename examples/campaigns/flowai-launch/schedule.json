@@ -1,0 +1,74 @@
+{
+  "campaignId": "flowai-launch-2026",
+  "timezone": "America/New_York",
+
+  "week1_teaser": {
+    "phase": "teaser",
+    "dates": "2026-04-07 to 2026-04-13",
+    "goal": "Build curiosity. Establish the problem. Grow followers.",
+    "posts": [
+      { "day": "Mon", "date": "2026-04-07", "platform": "x",      "time": "09:00", "contentId": "x-teaser-1",  "type": "text" },
+      { "day": "Mon", "date": "2026-04-07", "platform": "tiktok",  "time": "19:00", "contentId": "tt-teaser-1", "type": "video" },
+      { "day": "Tue", "date": "2026-04-08", "platform": "x",      "time": "12:00", "contentId": "x-teaser-2",  "type": "poll" },
+      { "day": "Tue", "date": "2026-04-08", "platform": "tiktok",  "time": "20:00", "contentId": "tt-teaser-2", "type": "video" },
+      { "day": "Wed", "date": "2026-04-09", "platform": "x",      "time": "08:30", "contentId": "x-teaser-3",  "type": "text" },
+      { "day": "Thu", "date": "2026-04-10", "platform": "x",      "time": "15:00", "contentId": null,          "type": "text", "note": "Engagement post — reply to top comments from teaser" },
+      { "day": "Fri", "date": "2026-04-11", "platform": "x",      "time": "09:00", "contentId": null,          "type": "text", "note": "Countdown: 'Revealing Monday. Any guesses?'" },
+      { "day": "Fri", "date": "2026-04-11", "platform": "tiktok",  "time": "19:00", "contentId": null,          "type": "video", "note": "3-day countdown teaser reel" },
+      { "day": "Sun", "date": "2026-04-13", "platform": "x",      "time": "20:00", "contentId": null,          "type": "text", "note": "'Tomorrow.' — single word tweet with product silhouette image" }
+    ]
+  },
+
+  "week2_launch": {
+    "phase": "launch",
+    "dates": "2026-04-14 to 2026-04-20",
+    "goal": "Reveal FlowAI. Demo features. Drive early access signups.",
+    "posts": [
+      { "day": "Mon", "date": "2026-04-14", "platform": "x",      "time": "09:00", "contentId": "x-launch-1",  "type": "text", "note": "THE launch tweet — pin this" },
+      { "day": "Mon", "date": "2026-04-14", "platform": "x",      "time": "09:05", "contentId": "x-thread-1",  "type": "thread", "note": "Reply thread to launch tweet" },
+      { "day": "Mon", "date": "2026-04-14", "platform": "tiktok",  "time": "12:00", "contentId": "tt-launch-1", "type": "video", "note": "Hero launch video" },
+      { "day": "Mon", "date": "2026-04-14", "platform": "tiktok",  "time": "19:00", "contentId": "tt-launch-2", "type": "video", "note": "Quick 15s teaser cut" },
+      { "day": "Tue", "date": "2026-04-15", "platform": "x",      "time": "12:00", "contentId": "x-launch-2",  "type": "text" },
+      { "day": "Wed", "date": "2026-04-16", "platform": "x",      "time": "08:00", "contentId": "x-launch-3",  "type": "text" },
+      { "day": "Wed", "date": "2026-04-16", "platform": "tiktok",  "time": "20:00", "contentId": null,          "type": "video", "note": "Behind the scenes: building FlowAI" },
+      { "day": "Thu", "date": "2026-04-17", "platform": "x",      "time": "15:00", "contentId": "x-launch-4",  "type": "text" },
+      { "day": "Fri", "date": "2026-04-18", "platform": "x",      "time": "09:00", "contentId": null,          "type": "text", "note": "Milestone: 'X people signed up in 5 days'" },
+      { "day": "Fri", "date": "2026-04-18", "platform": "tiktok",  "time": "19:00", "contentId": null,          "type": "video", "note": "Reaction to signup numbers" },
+      { "day": "Sat", "date": "2026-04-19", "platform": "tiktok",  "time": "11:00", "contentId": null,          "type": "video", "note": "Weekend casual — 'building in public' vlog style" }
+    ]
+  },
+
+  "week3_social_proof": {
+    "phase": "social_proof",
+    "dates": "2026-04-21 to 2026-04-27",
+    "goal": "Leverage early adopter results. Create FOMO. Close signups.",
+    "posts": [
+      { "day": "Mon", "date": "2026-04-21", "platform": "x",      "time": "09:00", "contentId": "x-proof-1",   "type": "text" },
+      { "day": "Mon", "date": "2026-04-21", "platform": "tiktok",  "time": "19:00", "contentId": "tt-proof-1",  "type": "video" },
+      { "day": "Tue", "date": "2026-04-22", "platform": "x",      "time": "12:00", "contentId": "x-proof-2",   "type": "text" },
+      { "day": "Wed", "date": "2026-04-23", "platform": "x",      "time": "08:30", "contentId": "x-proof-3",   "type": "text" },
+      { "day": "Wed", "date": "2026-04-23", "platform": "x",      "time": "08:35", "contentId": "x-thread-2",  "type": "thread" },
+      { "day": "Thu", "date": "2026-04-24", "platform": "tiktok",  "time": "20:00", "contentId": null,          "type": "video", "note": "User testimonial compilation" },
+      { "day": "Fri", "date": "2026-04-25", "platform": "x",      "time": "09:00", "contentId": null,          "type": "text", "note": "'Early access closes Sunday. X spots left.'" },
+      { "day": "Fri", "date": "2026-04-25", "platform": "tiktok",  "time": "19:00", "contentId": null,          "type": "video", "note": "Final CTA video — 'Last chance'" },
+      { "day": "Sun", "date": "2026-04-27", "platform": "x",      "time": "20:00", "contentId": null,          "type": "text", "note": "Campaign wrap: 'Early access is closed. Thank you to X people who joined.'" }
+    ]
+  },
+
+  "postingGuidelines": {
+    "x": {
+      "maxPerDay": 5,
+      "minGapMinutes": 120,
+      "bestTimes": ["09:00", "12:00", "15:00", "18:00"],
+      "engagementWindow": "Reply to comments within 30 min of posting",
+      "pinStrategy": "Pin launch tweet during week 2, pin results tweet during week 3"
+    },
+    "tiktok": {
+      "maxPerDay": 3,
+      "minGapMinutes": 240,
+      "bestTimes": ["12:00", "19:00", "21:00"],
+      "engagementWindow": "Reply to comments within 1 hour — TikTok boosts active reply sections",
+      "pinStrategy": "Pin hero launch video to profile"
+    }
+  }
+}
