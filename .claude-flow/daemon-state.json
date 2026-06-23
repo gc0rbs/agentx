@@ -1,14 +1,15 @@
 {
   "running": true,
-  "startedAt": "2026-03-24T20:32:38.784Z",
+  "startedAt": "2026-06-23T12:23:22.360Z",
   "workers": {
     "map": {
-      "runCount": 6,
-      "successCount": 6,
+      "runCount": 7,
+      "successCount": 7,
       "failureCount": 0,
-      "averageDurationMs": 1.1666666666666667,
-      "lastRun": "2026-03-24T20:32:38.787Z",
-      "nextRun": "2026-03-24T20:47:38.787Z",
+      "averageDurationMs": 1.1428571428571428,
+      "lastRun": "2026-06-23T12:23:22.365Z",
+      "lastStartedAt": "2026-06-23T12:23:22.364Z",
+      "nextRun": "2026-06-23T12:23:22.361Z",
       "isRunning": false
     },
     "audit": {
@@ -17,7 +18,7 @@
       "failureCount": 2,
       "averageDurationMs": 50894,
       "lastRun": "2026-03-24T20:35:09.013Z",
-      "nextRun": "2026-03-24T20:45:09.013Z",
+      "nextRun": "2026-06-23T12:25:22.361Z",
       "isRunning": false
     },
     "optimize": {
@@ -26,7 +27,7 @@
       "failureCount": 2,
       "averageDurationMs": 22309.5,
       "lastRun": "2026-03-24T20:37:21.426Z",
-      "nextRun": "2026-03-24T20:52:21.427Z",
+      "nextRun": "2026-06-23T12:27:22.361Z",
       "isRunning": false
     },
     "consolidate": {
@@ -35,7 +36,7 @@
       "failureCount": 0,
       "averageDurationMs": 1,
       "lastRun": "2026-03-24T20:38:38.863Z",
-      "nextRun": "2026-03-24T20:38:38.785Z",
+      "nextRun": "2026-06-23T12:29:22.361Z",
       "isRunning": false
     },
     "testgaps": {
@@ -44,7 +45,7 @@
       "failureCount": 0,
       "averageDurationMs": 46086,
       "lastRun": "2026-03-24T19:45:45.134Z",
-      "nextRun": "2026-03-24T20:40:38.785Z",
+      "nextRun": "2026-06-23T12:31:22.361Z",
       "isRunning": false
     },
     "predict": {
@@ -72,6 +73,8 @@
       "maxCpuLoad": 2,
       "minFreeMemoryPercent": 20
     },
+    "ttlMs": 43200000,
+    "idleShutdownMs": 0,
     "workers": [
       {
         "type": "map",
@@ -131,5 +134,5 @@
       }
     ]
   },
-  "savedAt": "2026-03-24T20:38:38.864Z"
+  "savedAt": "2026-06-23T12:23:22.365Z"
 }
