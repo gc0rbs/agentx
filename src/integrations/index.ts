@@ -3,3 +3,4 @@
  */
 
 export * from './gcp';
+export * from './x';
