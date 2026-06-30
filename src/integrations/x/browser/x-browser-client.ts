@@ -4,6 +4,7 @@
  */
 
 import { chromium, Browser, BrowserContext, Page } from 'playwright';
+import { existsSync, mkdirSync } from 'fs';
 import { createLogger } from '../../../core/logger';
 import type {
   XBrowserConfig,
@@ -52,7 +53,14 @@ export class XBrowserClient {
     };
 
     if (this.config.userDataDir) {
-      contextOptions.storageState = `${this.config.userDataDir}/state.json`;
+      const statePath = `${this.config.userDataDir}/state.json`;
+      // Only load storage state if the file exists
+      if (existsSync(statePath)) {
+        contextOptions.storageState = statePath;
+      } else {
+        // Create the directory for future session saves
+        mkdirSync(this.config.userDataDir, { recursive: true });
+      }
     }
 
     this.context = await this.browser.newContext(contextOptions);
