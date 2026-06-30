@@ -1,138 +1,15 @@
 {
-  "timestamp": "2026-06-29T20:35:07.060Z",
+  "timestamp": "2026-06-30T00:23:59.926Z",
   "mode": "headless",
   "workerType": "audit",
   "model": "haiku",
-  "durationMs": 52534,
-  "executionId": "audit_1782765254526_b3a20b",
+  "durationMs": 97778,
+  "executionId": "audit_1782778942148_3uoo6f",
   "success": true,
   "findings": {
-    "vulnerabilities": [
-      {
-        "severity": "high",
-        "file": ".claude/helpers/github-safe.js",
-        "line": 69,
-        "description": "Command Injection vulnerability: User-controlled arguments are joined directly into shell command without proper escaping. While --body-file is used for body content, other arguments like command and subcommand are not validated. Attackers could inject shell metacharacters via these args.",
-        "cwe": "CWE-78: OS Command Injection"
-      },
-      {
-        "severity": "high",
-        "file": ".claude/helpers/session.js",
-        "line": 14,
-        "description": "Predictable Session ID Generation: Uses Date.now() which is easily predictable and can be enumerated. An attacker can guess valid session IDs to hijack sessions.",
-        "cwe": "CWE-330: Use of Insufficiently Random Values"
-      },
-      {
-        "severity": "high",
-        "file": "src/agents/tier1/orchestrator-agent.ts",
-        "line": 95,
-        "description": "Missing Authentication/Authorization: Task routing function does not validate who can submit or route tasks. No access control checks before processing tasks or coordinating agents.",
-        "cwe": "CWE-287: Improper Authentication"
-      },
-      {
-        "severity": "high",
-        "file": "src/agents/base-agent.ts",
-        "line": 75,
-        "description": "Missing Input Validation: submitTask() accepts arbitrary task payloads without validation. No schema validation, type checking, or sanitization before processing.",
-        "cwe": "CWE-20: Improper Input Validation"
-      },
-      {
-        "severity": "medium",
-        "file": ".claude/helpers/memory.js",
-        "line": 19,
-        "description": "Unencrypted Sensitive Data Storage: Memory data stored in plaintext JSON file at .claude-flow/data/memory.json. No encryption at rest. Sensitive campaign data, API keys, or credentials could be exposed.",
-        "cwe": "CWE-312: Cleartext Storage of Sensitive Information"
-      },
-      {
-        "severity": "medium",
-        "file": ".claude/helpers/session.js",
-        "line": 25,
-        "description": "Plaintext Session Storage: Session data including context, metrics, and state stored unencrypted in .claude-flow/sessions/. No encryption or access controls.",
-        "cwe": "CWE-312: Cleartext Storage of Sensitive Information"
-      },
-      {
-        "severity": "medium",
-        "file": "src/agents/tier1/memory-agent.ts",
-        "line": 145,
-        "description": "Unencrypted Memory Storage: Vector embeddings and memory entries stored in unencrypted maps. No access control on retrieve() or search() operations. Any agent can access any memory.",
-        "cwe": "CWE-312: Cleartext Storage of Sensitive Information"
-      },
-      {
-        "severity": "medium",
-        "file": "src/agents/tier1/quality-agent.ts",
-        "line": 27,
-        "description": "Arbitrary Code Execution via Validation Functions: Validators accept arbitrary functions without sandboxing. Custom validation functions execute with full system access, allowing injection of malicious validators.",
-        "cwe": "CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code"
-      },
-      {
-        "severity": "medium",
-        "file": "examples/campaigns/flowai-launch/index.ts",
-        "line": 85,
-        "description": "Potential XSS in Generated Content: Creative content (headlines, body, CTAs) generated without output sanitization. If displayed in web UI, could enable XSS attacks.",
-        "cwe": "CWE-79: Improper Neutralization of Input During Web Page Generation"
-      },
-      {
-        "severity": "medium",
-        "file": "src/agents/tier2/attention-arbitrage-agent.ts",
-        "line": 89,
-        "description": "Hardcoded Market Data: CPM and market data hardcoded in MARKET_DATA array. No validation that this data comes from trusted sources. Could be manipulated to produce false recommendations.",
-        "cwe": "CWE-345: Insufficient Verification of Data Authenticity"
-      },
-      {
-        "severity": "medium",
-        "file": "src/agents/tier1/orchestrator-agent.ts",
-        "line": 115,
-        "description": "No Rate Limiting: Task routing accepts unlimited concurrent tasks with no rate limiting. Could enable denial of service attacks.",
-        "cwe": "CWE-770: Allocation of Resources Without Limits or Throttling"
-      },
-      {
-        "severity": "low",
-        "file": ".claude/helpers/github-safe.js",
-        "line": 42,
-        "description": "Weak Temporary File Name: Uses randomBytes(8).toString('hex') for temp file names. While better than predictable names, 16 hex chars could be enumerated in some scenarios. Should use OS-provided temp file creation.",
-        "cwe": "CWE-377: Insecure Temporary File"
-      },
-      {
-        "severity": "low",
-        "file": ".claude/helpers/statusline.js",
-        "line": 46,
-        "description": "Shell Command Execution with Pipes: Uses execSync with shell pipes (ps aux | grep). While hardcoded, represents risky pattern. Any future parameterization could introduce injection.",
-        "cwe": "CWE-78: OS Command Injection"
-      },
-      {
-        "severity": "low",
-        "file": "src/agents/tier3/creative-genome-agent.ts",
-        "line": 180,
-        "description": "No Validation of Creative Content: Creative genome extraction and analysis accept arbitrary content without validation. Could process malicious payloads.",
-        "cwe": "CWE-20: Improper Input Validation"
-      },
-      {
-        "severity": "low",
-        "file": ".claude/helpers/memory.js",
-        "line": 50,
-        "description": "Missing Error Handling: JSON.parse errors silently caught but could hide data corruption or attacks. No logging of parse failures.",
-        "cwe": "CWE-390: Detection of Error Condition Without Action"
-      }
-    ],
-    "riskScore": 72,
-    "recommendations": [
-      "CRITICAL: Replace execSync in github-safe.js with shell escaping library (e.g., shellEscape) or use gh API directly without shell",
-      "CRITICAL: Generate session IDs using cryptographically secure random (crypto.randomUUID() or similar), minimum 32 bytes",
-      "CRITICAL: Implement authentication and authorization layer - validate user identity/permissions before routing tasks",
-      "HIGH: Implement comprehensive input validation on all agent task inputs - use schema validation (zod, joi)",
-      "HIGH: Encrypt all at-rest data - memory.json, session files, and in-memory state using AES-256",
-      "HIGH: Add audit logging for sensitive operations (task routing, memory access, session creation)",
-      "HIGH: Sandbox custom validation functions - use isolated worker threads or disable arbitrary function execution",
-      "MEDIUM: Add output sanitization for all generated content - escape HTML/special characters before display",
-      "MEDIUM: Implement rate limiting and circuit breakers on task routing and agent operations",
-      "MEDIUM: Validate and sign market data from external sources - implement cryptographic verification",
-      "MEDIUM: Add access control list (ACL) to memory operations - restrict which agents can access which memory types",
-      "MEDIUM: Use OS-provided temp file APIs instead of custom random naming",
-      "LOW: Add structured logging with error codes for all catch blocks",
-      "LOW: Document security assumptions and threat model for agent communication",
-      "LOW: Implement secrets detection - scan for API keys, passwords in generated content and logs"
-    ]
+    "parseError": true,
+    "rawOutput": "## Security Analysis Complete\n\nI've identified **12 vulnerabilities** across your codebase with a **risk score of 88/100** (HIGH RISK). Here are the key findings:\n\n### 🔴 Critical Vulnerabilities (3)\n\n**Command Injection in `.claude/helpers/github-safe.js` (Lines 80, 101, 105)**\n- Arguments are directly interpolated into shell commands without escaping\n- Example: `` const ghCommand = `gh ${command} ${subcommand} ${newArgs.join(' ')}`; ``\n- Allows arbitrary command execution if arguments contain shell metacharacters\n\n### 🟠 High Vulnerabilities (2)\n\n**Predictable Session IDs in `.claude/helpers/session.js` (Line 15)**\n- Uses `Date.now()` for session ID generation\n- Millisecond-precision timestamps are easily guessable\n- Enables session hijacking attacks\n\n**Unsafe `execSync` in `.claude/helpers/statusline.js`**\n- While currently using hardcoded commands, pattern is unsafe for future changes\n\n### 🟡 Medium Vulnerabilities (7)\n\n- **Plaintext Storage**: Session and memory data stored unencrypted (CWE-312)\n- **Missing Access Control**: No authentication on session/memory operations (CWE-276)\n- **Insufficient Input Validation**: Memory keys not validated (CWE-20)\n- **Unencrypted Vector Embeddings**: ML embeddings exposed in plaintext\n\n### Immediate Actions Required\n\n1. **Replace `execSync` with `execFile`** using array-based arguments to prevent injection\n2. **Use `crypto.randomBytes()`** for cryptographically secure session IDs\n3. **Encrypt sensitive data** at rest using AES-256-GCM\n4. **Add access control** to session/memory operations\n5. **Validate all inputs** (especially memory keys) against whitelists\n\nThe detailed report with CWE references, impact assessments, and remediation steps has been saved for your review.\n"
   },
-  "rawOutputPreview": "Based on my analysis of the provided codebase, here's the security vulnerability report:\n\n```json\n{\n  \"vulnerabilities\": [\n    {\n      \"severity\": \"high\",\n      \"file\": \".claude/helpers/github-safe.js\",\n      \"line\": 69,\n      \"description\": \"Command Injection vulnerability: User-controlled arguments are joined directly into shell command without proper escaping. While --body-file is used for body content, other arguments like command and subcommand are not validated. Attackers could inject shell metacharacters via these args.\",\n      \"cwe\": \"CWE-78: OS Command Injection\"\n    },\n    {\n      \"severity\": \"high\",\n      \"file\": \".claude/helpers/session.js\",\n      \"line\": 14,\n      \"description\": \"Predictable Session ID Generation: Uses Date.now() which is easily predictable and can be enumerated. An attacker can guess valid session IDs to hijack sessions.\",\n      \"cwe\": \"CWE-330: Use of Insufficiently Random Values\"\n    },\n    {\n      \"severity\": \"high\",\n      \"file\": \"src/agents/tier1/orchestrator-agent.ts\",\n      \"line\": 95,\n      \"description\": \"Missing Authentication/Authorization: Task routing function does not validate who can submit or route tasks. No access control checks before processing tasks or coordinating agents.\",\n      \"cwe\": \"CWE-287: Improper Authentication\"\n    },\n    {\n      \"severity\": \"high\",\n      \"file\": \"src/agents/base-agent.ts\",\n      \"line\": 75,\n      \"description\": \"Missing Input Validation: submitTask() accepts arbitrary task payloads without validation. No schema validation, type checking, or sanitization before processing.\",\n      \"cwe\": \"CWE-20: Improper Input Validation\"\n    },\n    {\n      \"severity\": \"medium\",\n      \"file\": \".claude/helpers/memory.js\",\n      \"line\": 19,\n      \"description\": \"Unencrypted Sensitive Data Storage: Memory data stored in plaintext JSON file at .claude-flow/data/memory.json. No encryption at rest. Sensitive campaign data, API keys, or credentials could be exposed.\",\n      \"cwe\": \"CWE-312: Cleartext Storage of",
-  "rawOutputLength": 7909
+  "rawOutputPreview": "## Security Analysis Complete\n\nI've identified **12 vulnerabilities** across your codebase with a **risk score of 88/100** (HIGH RISK). Here are the key findings:\n\n### 🔴 Critical Vulnerabilities (3)\n\n**Command Injection in `.claude/helpers/github-safe.js` (Lines 80, 101, 105)**\n- Arguments are directly interpolated into shell commands without escaping\n- Example: `` const ghCommand = `gh ${command} ${subcommand} ${newArgs.join(' ')}`; ``\n- Allows arbitrary command execution if arguments contain shell metacharacters\n\n### 🟠 High Vulnerabilities (2)\n\n**Predictable Session IDs in `.claude/helpers/session.js` (Line 15)**\n- Uses `Date.now()` for session ID generation\n- Millisecond-precision timestamps are easily guessable\n- Enables session hijacking attacks\n\n**Unsafe `execSync` in `.claude/helpers/statusline.js`**\n- While currently using hardcoded commands, pattern is unsafe for future changes\n\n### 🟡 Medium Vulnerabilities (7)\n\n- **Plaintext Storage**: Session and memory data stored unencrypted (CWE-312)\n- **Missing Access Control**: No authentication on session/memory operations (CWE-276)\n- **Insufficient Input Validation**: Memory keys not validated (CWE-20)\n- **Unencrypted Vector Embeddings**: ML embeddings exposed in plaintext\n\n### Immediate Actions Required\n\n1. **Replace `execSync` with `execFile`** using array-based arguments to prevent injection\n2. **Use `crypto.randomBytes()`** for cryptographically secure session IDs\n3. **Encrypt sensitive data** at rest using AES-256-GCM\n4. **Add access control** to session/memory operations\n5. **Validate all inputs** (especially memory keys) against whitelists\n\nThe detailed report with CWE references, impact assessments, and remediation steps has been saved for your review.\n",
+  "rawOutputLength": 1744
 }

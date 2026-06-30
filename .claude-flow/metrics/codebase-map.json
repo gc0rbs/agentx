@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-29T20:35:07.062Z",
+  "timestamp": "2026-06-30T00:23:59.928Z",
   "projectRoot": "/home/user/aas",
   "structure": {
     "hasPackageJson": true,
@@ -7,5 +7,5 @@
     "hasClaudeConfig": true,
     "hasClaudeFlow": true
   },
-  "scannedAt": 1782765307062
+  "scannedAt": 1782779039928
 }
