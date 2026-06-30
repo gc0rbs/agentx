@@ -1,0 +1,409 @@
+/**
+ * X Browser Automation Client
+ * Uses Playwright to automate X.com directly
+ */
+
+import { chromium, Browser, BrowserContext, Page } from 'playwright';
+import { createLogger } from '../../../core/logger';
+import type {
+  XBrowserConfig,
+  XCredentials,
+  PostResult,
+  ThreadResult,
+  TweetData,
+  UIAnalytics,
+} from './x-browser-types';
+
+const logger = createLogger('x-browser');
+
+const X_URL = 'https://x.com';
+const LOGIN_URL = 'https://x.com/i/flow/login';
+const COMPOSE_URL = 'https://x.com/compose/tweet';
+
+export class XBrowserClient {
+  private browser: Browser | null = null;
+  private context: BrowserContext | null = null;
+  private page: Page | null = null;
+  private config: XBrowserConfig;
+  private isLoggedIn = false;
+
+  constructor(config: XBrowserConfig = {}) {
+    this.config = {
+      headless: true,
+      timeout: 30000,
+      slowMo: 50,
+      ...config,
+    };
+  }
+
+  /**
+   * Initialize browser
+   */
+  async init(): Promise<void> {
+    this.browser = await chromium.launch({
+      headless: this.config.headless,
+      slowMo: this.config.slowMo,
+    });
+
+    const contextOptions: Record<string, unknown> = {
+      viewport: { width: 1280, height: 800 },
+      userAgent:
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    };
+
+    if (this.config.userDataDir) {
+      contextOptions.storageState = `${this.config.userDataDir}/state.json`;
+    }
+
+    this.context = await this.browser.newContext(contextOptions);
+    this.page = await this.context.newPage();
+    this.page.setDefaultTimeout(this.config.timeout || 30000);
+
+    logger.info('Browser initialized');
+  }
+
+  /**
+   * Login to X
+   */
+  async login(credentials: XCredentials): Promise<boolean> {
+    if (!this.page) throw new Error('Browser not initialized');
+
+    try {
+      await this.page.goto(LOGIN_URL, { waitUntil: 'networkidle' });
+      await this.page.waitForTimeout(2000);
+
+      // Enter username
+      const usernameInput = this.page.locator('input[autocomplete="username"]');
+      await usernameInput.waitFor({ state: 'visible' });
+      await usernameInput.fill(credentials.username);
+      await this.page.keyboard.press('Enter');
+      await this.page.waitForTimeout(1500);
+
+      // Check for email verification step
+      const emailInput = this.page.locator('input[data-testid="ocfEnterTextTextInput"]');
+      if (await emailInput.isVisible({ timeout: 3000 }).catch(() => false)) {
+        if (!credentials.email) {
+          throw new Error('Email verification required but not provided');
+        }
+        await emailInput.fill(credentials.email);
+        await this.page.keyboard.press('Enter');
+        await this.page.waitForTimeout(1500);
+      }
+
+      // Enter password
+      const passwordInput = this.page.locator('input[type="password"]');
+      await passwordInput.waitFor({ state: 'visible' });
+      await passwordInput.fill(credentials.password);
+      await this.page.keyboard.press('Enter');
+      await this.page.waitForTimeout(3000);
+
+      // Check if logged in
+      const homeLink = this.page.locator('a[data-testid="AppTabBar_Home_Link"]');
+      this.isLoggedIn = await homeLink.isVisible({ timeout: 10000 }).catch(() => false);
+
+      if (this.isLoggedIn) {
+        logger.info('Login successful');
+        await this.saveSession();
+      } else {
+        logger.error('Login failed - home link not found');
+      }
+
+      return this.isLoggedIn;
+    } catch (error) {
+      logger.error('Login error', { error });
+      return false;
+    }
+  }
+
+  /**
+   * Check if already logged in (from saved session)
+   */
+  async checkSession(): Promise<boolean> {
+    if (!this.page) throw new Error('Browser not initialized');
+
+    try {
+      await this.page.goto(X_URL, { waitUntil: 'networkidle' });
+      await this.page.waitForTimeout(2000);
+
+      const homeLink = this.page.locator('a[data-testid="AppTabBar_Home_Link"]');
+      this.isLoggedIn = await homeLink.isVisible({ timeout: 5000 }).catch(() => false);
+
+      logger.info('Session check', { isLoggedIn: this.isLoggedIn });
+      return this.isLoggedIn;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Save session state
+   */
+  private async saveSession(): Promise<void> {
+    if (!this.context || !this.config.userDataDir) return;
+
+    try {
+      await this.context.storageState({
+        path: `${this.config.userDataDir}/state.json`,
+      });
+      logger.info('Session saved');
+    } catch (error) {
+      logger.warn('Failed to save session', { error });
+    }
+  }
+
+  /**
+   * Post a tweet
+   */
+  async postTweet(text: string, mediaPath?: string): Promise<PostResult> {
+    if (!this.page) throw new Error('Browser not initialized');
+    if (!this.isLoggedIn) throw new Error('Not logged in');
+
+    try {
+      await this.page.goto(COMPOSE_URL, { waitUntil: 'networkidle' });
+      await this.page.waitForTimeout(1500);
+
+      // Find tweet compose box
+      const tweetBox = this.page.locator('[data-testid="tweetTextarea_0"]');
+      await tweetBox.waitFor({ state: 'visible' });
+      await tweetBox.click();
+      await this.page.keyboard.type(text, { delay: 20 });
+
+      // Upload media if provided
+      if (mediaPath) {
+        const fileInput = this.page.locator('input[data-testid="fileInput"]');
+        await fileInput.setInputFiles(mediaPath);
+        await this.page.waitForTimeout(3000);
+      }
+
+      // Click post button
+      const postButton = this.page.locator('[data-testid="tweetButton"]');
+      await postButton.waitFor({ state: 'visible' });
+      await postButton.click();
+
+      // Wait for post to complete
+      await this.page.waitForTimeout(3000);
+
+      // Try to get the tweet URL from redirect or notification
+      const currentUrl = this.page.url();
+      const tweetMatch = currentUrl.match(/status\/(\d+)/);
+
+      const result: PostResult = {
+        success: true,
+        tweetId: tweetMatch?.[1],
+        tweetUrl: tweetMatch ? currentUrl : undefined,
+      };
+
+      logger.info('Tweet posted', result);
+      return result;
+    } catch (error) {
+      logger.error('Failed to post tweet', { error });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
+  /**
+   * Post a thread
+   */
+  async postThread(tweets: TweetData[]): Promise<ThreadResult> {
+    if (!this.page) throw new Error('Browser not initialized');
+    if (!this.isLoggedIn) throw new Error('Not logged in');
+
+    const results: PostResult[] = [];
+
+    try {
+      await this.page.goto(COMPOSE_URL, { waitUntil: 'networkidle' });
+      await this.page.waitForTimeout(1500);
+
+      for (let i = 0; i < tweets.length; i++) {
+        const tweet = tweets[i];
+        const tweetBox = this.page.locator(`[data-testid="tweetTextarea_${i}"]`);
+        await tweetBox.waitFor({ state: 'visible' });
+        await tweetBox.click();
+        await this.page.keyboard.type(tweet.text, { delay: 20 });
+
+        if (tweet.mediaPath) {
+          const fileInput = this.page.locator('input[data-testid="fileInput"]').last();
+          await fileInput.setInputFiles(tweet.mediaPath);
+          await this.page.waitForTimeout(2000);
+        }
+
+        // Add another tweet to thread (except for last one)
+        if (i < tweets.length - 1) {
+          const addButton = this.page.locator('[data-testid="addButton"]');
+          await addButton.click();
+          await this.page.waitForTimeout(500);
+        }
+
+        results.push({ success: true });
+      }
+
+      // Post the thread
+      const postAllButton = this.page.locator('[data-testid="tweetButton"]');
+      await postAllButton.click();
+      await this.page.waitForTimeout(3000);
+
+      const currentUrl = this.page.url();
+      const tweetMatch = currentUrl.match(/status\/(\d+)/);
+
+      logger.info('Thread posted', { tweetCount: tweets.length });
+
+      return {
+        success: true,
+        tweets: results,
+        threadUrl: tweetMatch ? currentUrl : undefined,
+      };
+    } catch (error) {
+      logger.error('Failed to post thread', { error });
+      return {
+        success: false,
+        tweets: results,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
+  /**
+   * Get analytics for a tweet from UI
+   */
+  async getTweetAnalytics(tweetUrl: string): Promise<UIAnalytics | null> {
+    if (!this.page) throw new Error('Browser not initialized');
+    if (!this.isLoggedIn) throw new Error('Not logged in');
+
+    try {
+      await this.page.goto(tweetUrl, { waitUntil: 'networkidle' });
+      await this.page.waitForTimeout(2000);
+
+      const parseMetric = async (testId: string): Promise<number> => {
+        const element = this.page!.locator(`[data-testid="${testId}"]`);
+        const text = await element.textContent().catch(() => '0');
+        return this.parseCount(text || '0');
+      };
+
+      const analytics: UIAnalytics = {
+        likes: await parseMetric('like'),
+        retweets: await parseMetric('retweet'),
+        replies: await parseMetric('reply'),
+        bookmarks: await parseMetric('bookmark'),
+        views: 0,
+      };
+
+      // Views are displayed differently
+      const viewsText = await this.page
+        .locator('a[href$="/analytics"]')
+        .textContent()
+        .catch(() => '0');
+      analytics.views = this.parseCount(viewsText || '0');
+
+      logger.info('Analytics fetched', analytics);
+      return analytics;
+    } catch (error) {
+      logger.error('Failed to get analytics', { error });
+      return null;
+    }
+  }
+
+  /**
+   * Parse count strings like "1.2K", "5M" to numbers
+   */
+  private parseCount(text: string): number {
+    const cleaned = text.replace(/[^0-9.KMB]/gi, '').trim();
+    if (!cleaned) return 0;
+
+    const multipliers: Record<string, number> = {
+      K: 1000,
+      M: 1000000,
+      B: 1000000000,
+    };
+
+    const match = cleaned.match(/^([\d.]+)([KMB])?$/i);
+    if (!match) return parseInt(cleaned) || 0;
+
+    const num = parseFloat(match[1]);
+    const suffix = match[2]?.toUpperCase();
+    return Math.round(num * (multipliers[suffix] || 1));
+  }
+
+  /**
+   * Like a tweet
+   */
+  async likeTweet(tweetUrl: string): Promise<boolean> {
+    if (!this.page) throw new Error('Browser not initialized');
+    if (!this.isLoggedIn) throw new Error('Not logged in');
+
+    try {
+      await this.page.goto(tweetUrl, { waitUntil: 'networkidle' });
+      await this.page.waitForTimeout(1500);
+
+      const likeButton = this.page.locator('[data-testid="like"]');
+      await likeButton.click();
+      await this.page.waitForTimeout(1000);
+
+      logger.info('Tweet liked', { tweetUrl });
+      return true;
+    } catch (error) {
+      logger.error('Failed to like tweet', { error });
+      return false;
+    }
+  }
+
+  /**
+   * Retweet a tweet
+   */
+  async retweet(tweetUrl: string): Promise<boolean> {
+    if (!this.page) throw new Error('Browser not initialized');
+    if (!this.isLoggedIn) throw new Error('Not logged in');
+
+    try {
+      await this.page.goto(tweetUrl, { waitUntil: 'networkidle' });
+      await this.page.waitForTimeout(1500);
+
+      const retweetButton = this.page.locator('[data-testid="retweet"]');
+      await retweetButton.click();
+      await this.page.waitForTimeout(500);
+
+      // Click "Repost" in the menu
+      const repostOption = this.page.locator('[data-testid="retweetConfirm"]');
+      await repostOption.click();
+      await this.page.waitForTimeout(1000);
+
+      logger.info('Tweet retweeted', { tweetUrl });
+      return true;
+    } catch (error) {
+      logger.error('Failed to retweet', { error });
+      return false;
+    }
+  }
+
+  /**
+   * Take screenshot (for debugging)
+   */
+  async screenshot(path: string): Promise<void> {
+    if (!this.page) throw new Error('Browser not initialized');
+    await this.page.screenshot({ path, fullPage: true });
+  }
+
+  /**
+   * Close browser
+   */
+  async close(): Promise<void> {
+    if (this.config.userDataDir) {
+      await this.saveSession();
+    }
+    await this.browser?.close();
+    this.browser = null;
+    this.context = null;
+    this.page = null;
+    this.isLoggedIn = false;
+    logger.info('Browser closed');
+  }
+}
+
+/**
+ * Create browser client instance
+ */
+export function createXBrowserClient(config?: XBrowserConfig): XBrowserClient {
+  return new XBrowserClient(config);
+}

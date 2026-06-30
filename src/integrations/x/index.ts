@@ -2,6 +2,7 @@
  * X (Twitter) Integration Exports
  */
 
+// API Client
 export { XClient, createXClient } from './x-client';
 export { XAuthClient, REQUIRED_SCOPES, OPTIONAL_SCOPES } from './x-auth';
 export type {
@@ -22,3 +23,14 @@ export type {
   XApiError,
   OAuthTokens,
 } from './x-types';
+
+// Browser Automation
+export { XBrowserClient, createXBrowserClient } from './browser';
+export type {
+  XBrowserConfig,
+  XCredentials,
+  PostResult,
+  ThreadResult,
+  TweetData,
+  UIAnalytics,
+} from './browser';
