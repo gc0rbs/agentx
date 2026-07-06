@@ -19,18 +19,18 @@
       "averageDurationMs": 76216.6,
       "lastRun": "2026-07-06T19:37:27.504Z",
       "lastStartedAt": "2026-07-06T19:35:03.446Z",
-      "nextRun": "2026-07-06T19:35:03.440Z",
+      "nextRun": "2026-07-06T19:47:27.505Z",
       "isRunning": false
     },
     "optimize": {
-      "runCount": 7,
-      "successCount": 5,
+      "runCount": 8,
+      "successCount": 6,
       "failureCount": 7,
-      "averageDurationMs": 93316.57142857143,
-      "lastRun": "2026-06-30T00:48:17.649Z",
+      "averageDurationMs": 94074.375,
+      "lastRun": "2026-07-06T19:38:42.823Z",
       "lastStartedAt": "2026-07-06T19:37:03.444Z",
       "nextRun": "2026-07-06T19:37:03.440Z",
-      "isRunning": true
+      "isRunning": false
     },
     "consolidate": {
       "runCount": 7,
@@ -170,5 +170,5 @@
       }
     ]
   },
-  "savedAt": "2026-07-06T19:37:27.504Z"
+  "savedAt": "2026-07-06T19:38:42.823Z"
 }
