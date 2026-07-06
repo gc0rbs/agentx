@@ -1,126 +1,15 @@
 {
-  "timestamp": "2026-06-30T02:29:04.949Z",
+  "timestamp": "2026-07-06T19:37:27.504Z",
   "mode": "headless",
   "workerType": "audit",
   "model": "haiku",
-  "durationMs": 135760,
-  "executionId": "audit_1782786409189_v5xf0e",
+  "durationMs": 144057,
+  "executionId": "audit_1783366503447_idn87q",
   "success": true,
   "findings": {
-    "vulnerabilities": [
-      {
-        "severity": "high",
-        "file": ".claude/helpers/github-safe.js",
-        "line": 57,
-        "description": "Command Injection: ghCommand constructed by joining user-supplied args without shell escaping. Attackers can inject arbitrary shell commands.",
-        "failure_scenario": "Body parameter contains: '; rm -rf / ; echo '. Results in arbitrary shell command execution."
-      },
-      {
-        "severity": "high",
-        "file": ".claude/helpers/statusline.js",
-        "line": 72,
-        "description": "Command Injection: execSync runs git config with shell interpretation. Malicious git user.name (e.g., '$(malicious_command)') executes arbitrary code.",
-        "failure_scenario": "Git user.name set to '$(whoami > /tmp/pwned)' causes code execution when statusline queries it."
-      },
-      {
-        "severity": "high",
-        "file": "examples/x-automation/post-tweet.ts",
-        "line": 32,
-        "description": "Hardcoded Credential Handling: X_USERNAME and X_PASSWORD passed in plaintext via environment variables, exposed in process memory and logs.",
-        "failure_scenario": "Process memory dump or log exposure reveals X credentials used for authentication."
-      },
-      {
-        "severity": "high",
-        "file": "src/integrations/x/browser/x-browser-client.ts",
-        "line": 146,
-        "description": "Insecure Session Storage: Browser session state including auth tokens stored in plaintext JSON file without encryption. World-readable by default.",
-        "failure_scenario": "Attacker reads ${userDataDir}/state.json, extracts session cookies/tokens, hijacks X.com session."
-      },
-      {
-        "severity": "medium",
-        "file": ".claude/helpers/github-safe.js",
-        "line": 48,
-        "description": "Insecure Temp File Handling: Temporary files created in world-readable tmpdir without restrictive permissions. Race condition between creation and use.",
-        "failure_scenario": "Another user on system reads temp file before deletion, obtaining API response bodies or command input."
-      },
-      {
-        "severity": "medium",
-        "file": "src/agents/base-agent.ts",
-        "line": 50,
-        "description": "Missing Authentication/Authorization: No access control on agent spawning or task routing. Any code can execute arbitrary tasks.",
-        "failure_scenario": "Unauthorized actor spawns agents and routes sensitive tasks without user verification."
-      },
-      {
-        "severity": "medium",
-        "file": "src/integrations/x/x-auth.ts",
-        "line": 28,
-        "description": "OAuth Tokens in Memory: Access/refresh tokens stored in plaintext memory objects. Could be extracted via memory disclosure.",
-        "failure_scenario": "Debugger or memory dump reveals valid OAuth tokens used for authentication bypass."
-      },
-      {
-        "severity": "medium",
-        "file": "src/security/secrets-manager.ts",
-        "line": 79,
-        "description": "Insecure In-Memory Secrets: MemorySecretsProvider stores secrets in plaintext JavaScript Maps without memory protection.",
-        "failure_scenario": "Process memory analysis extracts plaintext secrets stored in development/test scenarios deployed to production."
-      },
-      {
-        "severity": "medium",
-        "file": ".claude/helpers/memory.js",
-        "line": 16,
-        "description": "Plaintext Data Storage: Memory helper saves unencrypted JSON without validation. Could contain API keys, credentials, personal data.",
-        "failure_scenario": "Attacker reads .claude-flow/data/memory.json, extracts stored API keys or business intelligence."
-      },
-      {
-        "severity": "medium",
-        "file": ".claude/helpers/session.js",
-        "line": 24,
-        "description": "Weak Session IDs: Sessions generated using predictable Date.now() instead of cryptographic randomness.",
-        "failure_scenario": "Attacker guesses session ID (known timestamp ±1ms), hijacks user session without authentication."
-      },
-      {
-        "severity": "medium",
-        "file": "src/agents/tier1/quality-agent.ts",
-        "line": 488,
-        "description": "Unsafe JSON.parse: No try-catch on JSON.parse. Malformed input throws unhandled exceptions leaking error info.",
-        "failure_scenario": "Attacker sends invalid JSON triggering parse error. Exception message reveals internal state or causes DoS."
-      },
-      {
-        "severity": "low",
-        "file": "src/integrations/x/browser/x-browser-client.ts",
-        "line": 78,
-        "description": "Credentials Logged in Plaintext: Credentials passed to Playwright methods could be captured in debug logs.",
-        "failure_scenario": "Debug logs or Playwright traces expose username/password in plaintext files."
-      },
-      {
-        "severity": "low",
-        "file": "src/agents/tier1/memory-agent.ts",
-        "line": 150,
-        "description": "Unencrypted Vector Embeddings: HNSW embeddings store encoded campaign/creative data in memory without encryption.",
-        "failure_scenario": "Vector embeddings extracted and analyzed to reverse-engineer business strategy or sensitive campaigns."
-      },
-      {
-        "severity": "low",
-        "file": "src/security/input-validator.ts",
-        "line": 146,
-        "description": "Permissive HTML Type: 'html' creative type allows raw HTML without sanitization, leading to XSS if rendered.",
-        "failure_scenario": "Attacker submits creative with HTML type containing <script>alert('xss')</script>, executes in browser."
-      }
-    ],
-    "riskScore": 72,
-    "recommendations": [
-      "Immediately patch command injection vulnerabilities using array-based exec (e.g., execSync(['git', 'config', 'user.name']))",
-      "Replace password auth with OAuth2; store tokens in OS keychain (Keychain, Credential Manager, Secret Service)",
-      "Encrypt all sensitive data at rest using AES-256; use Google Secret Manager or AWS Secrets Manager for production",
-      "Implement role-based access control (RBAC) with authentication/authorization on all agent operations",
-      "Use cryptographic session IDs (crypto.randomBytes) instead of Date.now()",
-      "Add try-catch around JSON.parse; never log credentials or sensitive data",
-      "Run 'npm audit' and implement SAST/SCA tools (Semgrep, Snyk) in CI/CD pipeline",
-      "Restrict temporary file permissions to 0o600; encrypt session storage",
-      "Remove or sanitize 'html' creative type using DOMPurify if needed",
-      "Implement secure logging with field masking for sensitive data"
-    ]
+    "parseError": true,
+    "rawOutput": "## Security Analysis Report\n\nI've completed a comprehensive security analysis of your codebase. Here are the findings:\n\n### **Critical Vulnerabilities Found**\n\n**Risk Score: 82/100** (High Risk)\n\n#### **HIGH SEVERITY (5 findings)**\n\n1. **Command Injection in github-safe.js (lines 80, 101)**\n   - Arguments from `process.argv` are directly interpolated into shell commands without escaping\n   - Exploit: `./github-safe.js \"issue; rm -rf /\" comment 123 \"body\"`\n   - **Fix**: Use `child_process.execFile()` with argument arrays instead of string interpolation\n\n2. **Plaintext Password Storage (4 locations)**\n   - `examples/x-automation/post-tweet.ts:23` - X_PASSWORD from environment\n   - `examples/x-automation/post-thread.ts:20` - Same issue\n   - `examples/x-automation/run-campaign.ts:63` - Same issue\n   - **Risk**: Exposed via `ps aux`, logs, environment dumps, debuggers\n   - **Fix**: Use SecretsProvider interface from `src/security/secrets-manager.ts`\n\n3. **Unencrypted Session Storage (3 locations)**\n   - `examples/x-automation/post-tweet.ts:32` - Saves credentials in `./data/x-session`\n   - `examples/x-automation/run-campaign.ts:26` - State file `./data/campaign-state.json`\n   - Sessions persisted as plaintext JSON, accessible to any system user\n   - **Fix**: AES-256 encrypt session data with secure key management\n\n#### **MEDIUM SEVERITY (4 findings)**\n\n4. **Path Traversal Vulnerability (run-campaign.ts:49)**\n   - User-supplied file path not validated\n   - Exploit: `run-campaign.ts ../../../etc/passwd`\n   - **Fix**: Use `path.resolve()` and validate against allowed directories\n\n5. **Insecure Temporary Files (github-safe.js:62)**\n   - Temp files in `/tmp` may be world-readable\n   - **Fix**: Use secure temp directory with mode 0700\n\n6. **Missing Input Validation (run-campaign.ts:49)**\n   - JSON parsed without schema validation\n   - **Fix**: Validate JSON structure before deserialization\n\n#### **LOW SEVERITY (2 findings)**\n\n7. **Unencrypted Memory Storage (.claude/helpers/memory.js:20)**\n   - Plaintext JSON at `.claude-flow/data/memory.json`\n\n8. **Unencrypted Session Files (.claude/helpers/session.js:18)**\n   - Predictable file locations with no encryption\n\n### **Top Recommendations**\n\n1. **CRITICAL**: Replace environment variable credentials with HashiCorp Vault, AWS Secrets Manager, or GCP Secret Manager\n2. **CRITICAL**: Fix command injection in github-safe.js - use execFile() with argument arrays\n3. **HIGH**: Implement AES-256 encryption for all persisted sensitive data\n4. **HIGH**: Add file permission validation (mode 0600) for credential files\n5. **HIGH**: Implement path traversal protection with path.resolve()\n6. **PROCESS**: Enable secret scanning in CI/CD (git-secrets, TruffleHog)\n\nThe codebase has a working `SecretsProvider` interface that should be used instead of environment variables. The X authentication examples need significant security hardening before production use.\n"
   },
-  "rawOutputPreview": "Here's the comprehensive security vulnerability analysis for your codebase:\n\n```json\n{\n  \"vulnerabilities\": [\n    {\n      \"severity\": \"high\",\n      \"file\": \".claude/helpers/github-safe.js\",\n      \"line\": 57,\n      \"description\": \"Command Injection: ghCommand constructed by joining user-supplied args without shell escaping. Attackers can inject arbitrary shell commands.\",\n      \"failure_scenario\": \"Body parameter contains: '; rm -rf / ; echo '. Results in arbitrary shell command execution.\"\n    },\n    {\n      \"severity\": \"high\",\n      \"file\": \".claude/helpers/statusline.js\",\n      \"line\": 72,\n      \"description\": \"Command Injection: execSync runs git config with shell interpretation. Malicious git user.name (e.g., '$(malicious_command)') executes arbitrary code.\",\n      \"failure_scenario\": \"Git user.name set to '$(whoami > /tmp/pwned)' causes code execution when statusline queries it.\"\n    },\n    {\n      \"severity\": \"high\",\n      \"file\": \"examples/x-automation/post-tweet.ts\",\n      \"line\": 32,\n      \"description\": \"Hardcoded Credential Handling: X_USERNAME and X_PASSWORD passed in plaintext via environment variables, exposed in process memory and logs.\",\n      \"failure_scenario\": \"Process memory dump or log exposure reveals X credentials used for authentication.\"\n    },\n    {\n      \"severity\": \"high\",\n      \"file\": \"src/integrations/x/browser/x-browser-client.ts\",\n      \"line\": 146,\n      \"description\": \"Insecure Session Storage: Browser session state including auth tokens stored in plaintext JSON file without encryption. World-readable by default.\",\n      \"failure_scenario\": \"Attacker reads ${userDataDir}/state.json, extracts session cookies/tokens, hijacks X.com session.\"\n    },\n    {\n      \"severity\": \"medium\",\n      \"file\": \".claude/helpers/github-safe.js\",\n      \"line\": 48,\n      \"description\": \"Insecure Temp File Handling: Temporary files created in world-readable tmpdir without restrictive permissions. Race condition between creation and use.\",\n      \"failure_",
-  "rawOutputLength": 7082
+  "rawOutputPreview": "## Security Analysis Report\n\nI've completed a comprehensive security analysis of your codebase. Here are the findings:\n\n### **Critical Vulnerabilities Found**\n\n**Risk Score: 82/100** (High Risk)\n\n#### **HIGH SEVERITY (5 findings)**\n\n1. **Command Injection in github-safe.js (lines 80, 101)**\n   - Arguments from `process.argv` are directly interpolated into shell commands without escaping\n   - Exploit: `./github-safe.js \"issue; rm -rf /\" comment 123 \"body\"`\n   - **Fix**: Use `child_process.execFile()` with argument arrays instead of string interpolation\n\n2. **Plaintext Password Storage (4 locations)**\n   - `examples/x-automation/post-tweet.ts:23` - X_PASSWORD from environment\n   - `examples/x-automation/post-thread.ts:20` - Same issue\n   - `examples/x-automation/run-campaign.ts:63` - Same issue\n   - **Risk**: Exposed via `ps aux`, logs, environment dumps, debuggers\n   - **Fix**: Use SecretsProvider interface from `src/security/secrets-manager.ts`\n\n3. **Unencrypted Session Storage (3 locations)**\n   - `examples/x-automation/post-tweet.ts:32` - Saves credentials in `./data/x-session`\n   - `examples/x-automation/run-campaign.ts:26` - State file `./data/campaign-state.json`\n   - Sessions persisted as plaintext JSON, accessible to any system user\n   - **Fix**: AES-256 encrypt session data with secure key management\n\n#### **MEDIUM SEVERITY (4 findings)**\n\n4. **Path Traversal Vulnerability (run-campaign.ts:49)**\n   - User-supplied file path not validated\n   - Exploit: `run-campaign.ts ../../../etc/passwd`\n   - **Fix**: Use `path.resolve()` and validate against allowed directories\n\n5. **Insecure Temporary Files (github-safe.js:62)**\n   - Temp files in `/tmp` may be world-readable\n   - **Fix**: Use secure temp directory with mode 0700\n\n6. **Missing Input Validation (run-campaign.ts:49)**\n   - JSON parsed without schema validation\n   - **Fix**: Validate JSON structure before deserialization\n\n#### **LOW SEVERITY (2 findings)**\n\n7. **Unencrypted Memory Storage (.claude/helpers/me",
+  "rawOutputLength": 2928
 }

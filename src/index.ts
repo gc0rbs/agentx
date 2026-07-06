@@ -37,6 +37,9 @@ export { validateCampaignInput, sanitizeHtml, sanitizeSqlIdentifier } from './se
 export { SecretsManager, createSecretsManager, SecretNames } from './security/secrets-manager';
 export { AuditLogger, getAuditLogger } from './security/audit-logger';
 
+// Campaign orchestration (scheduler → live posting → analytics)
+export { CampaignRunner, CampaignStore, mapUIAnalytics } from './orchestrator';
+
 // Performance utilities
 export { LRUCache, TieredCache } from './performance/cache';
 export { ConnectionPool, Connection } from './performance/connection-pool';

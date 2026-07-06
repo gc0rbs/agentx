@@ -100,11 +100,11 @@ export class XAuthClient {
 
     if (!response.ok) {
       const error = await response.text();
-      logger.error('Token exchange failed', { status: response.status, error });
+      logger.error('Token exchange failed', undefined, { status: response.status, error });
       throw new Error(`Token exchange failed: ${error}`);
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as { access_token: string; refresh_token: string; expires_in: number; scope: string };
     this.tokens = {
       accessToken: data.access_token,
       refreshToken: data.refresh_token,
@@ -145,11 +145,11 @@ export class XAuthClient {
 
     if (!response.ok) {
       const error = await response.text();
-      logger.error('Token refresh failed', { status: response.status, error });
+      logger.error('Token refresh failed', undefined, { status: response.status, error });
       throw new Error(`Token refresh failed: ${error}`);
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as { access_token: string; refresh_token: string; expires_in: number; scope: string };
     this.tokens = {
       accessToken: data.access_token,
       refreshToken: data.refresh_token,

@@ -118,7 +118,7 @@ export class XBrowserClient {
 
       return this.isLoggedIn;
     } catch (error) {
-      logger.error('Login error', { error });
+      logger.error('Login error', error instanceof Error ? error : undefined);
       return false;
     }
   }
@@ -201,10 +201,10 @@ export class XBrowserClient {
         tweetUrl: tweetMatch ? currentUrl : undefined,
       };
 
-      logger.info('Tweet posted', result);
+      logger.info('Tweet posted', { ...result });
       return result;
     } catch (error) {
-      logger.error('Failed to post tweet', { error });
+      logger.error('Failed to post tweet', error instanceof Error ? error : undefined);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -264,7 +264,7 @@ export class XBrowserClient {
         threadUrl: tweetMatch ? currentUrl : undefined,
       };
     } catch (error) {
-      logger.error('Failed to post thread', { error });
+      logger.error('Failed to post thread', error instanceof Error ? error : undefined);
       return {
         success: false,
         tweets: results,
@@ -305,10 +305,10 @@ export class XBrowserClient {
         .catch(() => '0');
       analytics.views = this.parseCount(viewsText || '0');
 
-      logger.info('Analytics fetched', analytics);
+      logger.info('Analytics fetched', { ...analytics });
       return analytics;
     } catch (error) {
-      logger.error('Failed to get analytics', { error });
+      logger.error('Failed to get analytics', error instanceof Error ? error : undefined);
       return null;
     }
   }
@@ -352,7 +352,7 @@ export class XBrowserClient {
       logger.info('Tweet liked', { tweetUrl });
       return true;
     } catch (error) {
-      logger.error('Failed to like tweet', { error });
+      logger.error('Failed to like tweet', error instanceof Error ? error : undefined);
       return false;
     }
   }
@@ -380,7 +380,7 @@ export class XBrowserClient {
       logger.info('Tweet retweeted', { tweetUrl });
       return true;
     } catch (error) {
-      logger.error('Failed to retweet', { error });
+      logger.error('Failed to retweet', error instanceof Error ? error : undefined);
       return false;
     }
   }

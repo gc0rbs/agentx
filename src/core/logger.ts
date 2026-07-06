@@ -4,6 +4,7 @@
  */
 
 import pino from 'pino';
+import { createRequire } from 'module';
 import type { AgentId } from '../types/index.js';
 
 export interface LogContext {
@@ -24,19 +25,27 @@ export interface Logger {
 
 const logLevel = process.env.LOG_LEVEL ?? 'info';
 
+// pino-pretty is optional — fall back to plain JSON logs when it isn't installed
+function prettyTransport(): pino.TransportSingleOptions | undefined {
+  if (process.env.NODE_ENV === 'production') return undefined;
+  try {
+    createRequire(import.meta.url).resolve('pino-pretty');
+    return {
+      target: 'pino-pretty',
+      options: {
+        colorize: true,
+        translateTime: 'SYS:standard',
+        ignore: 'pid,hostname',
+      },
+    };
+  } catch {
+    return undefined;
+  }
+}
+
 const pinoLogger = pino({
   level: logLevel,
-  transport:
-    process.env.NODE_ENV !== 'production'
-      ? {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-            translateTime: 'SYS:standard',
-            ignore: 'pid,hostname',
-          },
-        }
-      : undefined,
+  transport: prettyTransport(),
   base: {
     service: 'ai-marketing-swarm',
   },

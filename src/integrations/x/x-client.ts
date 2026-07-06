@@ -72,8 +72,10 @@ export class XClient {
     this.updateRateLimits(endpoint, response.headers);
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ detail: response.statusText }));
-      logger.error('API request failed', {
+      const error = (await response.json().catch(() => ({ detail: response.statusText }))) as {
+        detail?: string;
+      };
+      logger.error('API request failed', undefined, {
         endpoint,
         status: response.status,
         error,
@@ -81,7 +83,7 @@ export class XClient {
       throw new Error(`X API error: ${error.detail || response.statusText}`);
     }
 
-    return response.json();
+    return (await response.json()) as XApiResponse<T>;
   }
 
   /**
@@ -268,7 +270,7 @@ export class XClient {
       throw new Error(`Media upload failed: ${response.statusText}`);
     }
 
-    const result = await response.json();
+    const result = (await response.json()) as { media_id_string: string };
     logger.info('Media uploaded', { mediaId: result.media_id_string });
     return result.media_id_string;
   }
@@ -301,7 +303,9 @@ export class XClient {
       throw new Error(`Media init failed: ${initResponse.statusText}`);
     }
 
-    const { media_id_string: mediaId } = await initResponse.json();
+    const { media_id_string: mediaId } = (await initResponse.json()) as {
+      media_id_string: string;
+    };
 
     // APPEND (chunk by 5MB)
     const chunkSize = 5 * 1024 * 1024;
@@ -342,7 +346,9 @@ export class XClient {
       throw new Error(`Media finalize failed: ${finalizeResponse.statusText}`);
     }
 
-    const result = await finalizeResponse.json();
+    const result = (await finalizeResponse.json()) as {
+      processing_info?: unknown;
+    };
 
     // Check processing status for video
     if (result.processing_info) {
@@ -371,7 +377,13 @@ export class XClient {
         }
       );
 
-      const result = await response.json();
+      const result = (await response.json()) as {
+        processing_info?: {
+          state: string;
+          check_after_secs: number;
+          error?: { message?: string };
+        };
+      };
 
       if (!result.processing_info) {
         return; // Done
@@ -386,7 +398,7 @@ export class XClient {
       }
 
       // Wait before checking again
-      await new Promise((r) => setTimeout(r, result.processing_info.check_after_secs * 1000));
+      await new Promise((r) => setTimeout(r, result.processing_info!.check_after_secs * 1000));
     }
 
     throw new Error('Media processing timed out');
@@ -492,7 +504,9 @@ export class XClient {
       throw new Error(`Trends request failed: ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as {
+      trends?: { name: string; tweetVolume: number | null }[];
+    }[];
     return data[0]?.trends || [];
   }
 }
