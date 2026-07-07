@@ -42,3 +42,6 @@ logs/
 npm-debug.log*
 
 # Note: .claude/, claude.md, and ruvector-upstream are INCLUDED in repo
+
+# Runtime data: campaign state, browser sessions (contains login cookies — never commit)
+data/
