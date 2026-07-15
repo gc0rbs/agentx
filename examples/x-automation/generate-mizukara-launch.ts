@@ -33,7 +33,7 @@ interface ScriptedPost {
 // The narrative. Read top to bottom — it's meant to flow as one story.
 const SEQUENCE: ScriptedPost[] = [
   // ── day 0 — arrival ─────────────────────────────────────────────
-  { day: 0, hour: 9, phase: 'teaser', text: `mizuki talked. i prove.` },
+  // NOTE: opener "mizuki talked. i prove." was posted manually — removed from the queue.
   {
     day: 0,
     hour: 13,
