@@ -1,13 +1,14 @@
 /**
- * Example: Post a tweet using browser automation
+ * Example: Post a single tweet using browser automation.
  *
  * Usage:
  *   npx tsx examples/x-automation/post-tweet.ts "Your tweet text here"
  *
- * Set credentials via environment variables:
- *   X_USERNAME - your X username or email
- *   X_PASSWORD - your X password
- *   X_EMAIL - (optional) email for verification step
+ * Auth (in priority order):
+ *   X_AUTH_TOKEN - X session cookie (preferred; skips password + 2FA)
+ *   X_USERNAME / X_PASSWORD / X_EMAIL - password login fallback
+ *
+ * The session is saved to ./data/x-session so re-runs skip auth.
  */
 
 import { createXBrowserClient } from '../../src/integrations/x';
@@ -19,11 +20,12 @@ async function main() {
     process.exit(1);
   }
 
+  const authToken = process.env.X_AUTH_TOKEN;
   const username = process.env.X_USERNAME;
   const password = process.env.X_PASSWORD;
 
-  if (!username || !password) {
-    console.error('Set X_USERNAME and X_PASSWORD environment variables');
+  if (!authToken && (!username || !password)) {
+    console.error('Set X_AUTH_TOKEN, or X_USERNAME + X_PASSWORD');
     process.exit(1);
   }
 
@@ -40,12 +42,18 @@ async function main() {
     const hasSession = await client.checkSession();
 
     if (!hasSession) {
-      console.log('Logging in...');
-      const loggedIn = await client.login({
-        username,
-        password,
-        email: process.env.X_EMAIL,
-      });
+      let loggedIn = false;
+      if (authToken) {
+        console.log('Authenticating via auth_token cookie...');
+        loggedIn = await client.loginWithCookie(authToken);
+      } else {
+        console.log('Logging in...');
+        loggedIn = await client.login({
+          username: username!,
+          password: password!,
+          email: process.env.X_EMAIL,
+        });
+      }
 
       if (!loggedIn) {
         console.error('Login failed');
