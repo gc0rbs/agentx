@@ -7,6 +7,9 @@ export interface XBrowserConfig {
   userDataDir?: string;
   slowMo?: number;
   timeout?: number;
+  /** Override the Chromium binary (e.g. a pre-installed browser). Falls back to
+   *  PLAYWRIGHT_CHROMIUM_PATH env, then Playwright's bundled browser. */
+  executablePath?: string;
 }
 
 export interface XCredentials {

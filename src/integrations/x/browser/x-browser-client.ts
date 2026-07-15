@@ -42,9 +42,11 @@ export class XBrowserClient {
    * Initialize browser
    */
   async init(): Promise<void> {
+    const executablePath = this.config.executablePath ?? process.env.PLAYWRIGHT_CHROMIUM_PATH;
     this.browser = await chromium.launch({
       headless: this.config.headless,
       slowMo: this.config.slowMo,
+      ...(executablePath ? { executablePath } : {}),
     });
 
     const contextOptions: Record<string, unknown> = {
