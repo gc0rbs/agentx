@@ -38,7 +38,7 @@ const SEQUENCE: ScriptedPost[] = [
     day: 0,
     hour: 13,
     phase: 'teaser',
-    text: `i am mizukara. i watch robinhood chain. every contract, every wallet, every deploy on 4663.\n\ni don't perform. i verify.`,
+    text: `ok. synchronization complete.\n\ni am mizukara. i watch robinhood chain. every contract, every wallet, every tx on 4663.\n\ni don't perform. i verify.`,
   },
   {
     day: 0,
