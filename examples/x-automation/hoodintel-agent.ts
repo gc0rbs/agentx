@@ -102,12 +102,20 @@ async function main() {
 
   const hasSession = await x.checkSession();
   if (!hasSession) {
-    console.log('Logging in as @' + hoodintel.handle + '...');
-    const ok = await x.login({
-      username: username!,
-      password: password!,
-      email: process.env.X_EMAIL,
-    });
+    // Prefer cookie auth (X_AUTH_TOKEN) if available; fall back to password login
+    const authToken = process.env.X_AUTH_TOKEN;
+    let ok = false;
+    if (authToken) {
+      console.log('Authenticating via auth_token cookie...');
+      ok = await x.loginWithCookie(authToken);
+    } else {
+      console.log('Logging in as @' + hoodintel.handle + '...');
+      ok = await x.login({
+        username: username!,
+        password: password!,
+        email: process.env.X_EMAIL,
+      });
+    }
     if (!ok) {
       console.error('Login failed');
       await x.close();

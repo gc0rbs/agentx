@@ -125,6 +125,52 @@ export class XBrowserClient {
   }
 
   /**
+   * Authenticate by injecting an X auth_token session cookie.
+   * Avoids the username/password + 2FA flow entirely.
+   *
+   * The token is never persisted by this method — pass it from an env var.
+   * X's frontend derives the ct0 (CSRF) cookie itself once the session loads.
+   */
+  async loginWithCookie(authToken: string): Promise<boolean> {
+    if (!this.context || !this.page) throw new Error('Browser not initialized');
+
+    try {
+      await this.context.addCookies([
+        {
+          name: 'auth_token',
+          value: authToken,
+          domain: '.x.com',
+          path: '/',
+          httpOnly: true,
+          secure: true,
+          sameSite: 'None',
+        },
+        {
+          name: 'auth_token',
+          value: authToken,
+          domain: '.twitter.com',
+          path: '/',
+          httpOnly: true,
+          secure: true,
+          sameSite: 'None',
+        },
+      ]);
+
+      const ok = await this.checkSession();
+      if (ok) {
+        logger.info('Authenticated via auth_token cookie');
+        await this.saveSession();
+      } else {
+        logger.error('auth_token cookie did not produce a logged-in session');
+      }
+      return ok;
+    } catch (error) {
+      logger.error('Cookie auth failed', error instanceof Error ? error : undefined);
+      return false;
+    }
+  }
+
+  /**
    * Check if already logged in (from saved session)
    */
   async checkSession(): Promise<boolean> {
