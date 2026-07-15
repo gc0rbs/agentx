@@ -41,6 +41,13 @@ export interface TweetData {
   mediaUrls?: string[];
 }
 
+export interface Mention {
+  tweetId: string;
+  tweetUrl: string;
+  author: string;
+  text: string;
+}
+
 export interface UIAnalytics {
   likes: number;
   retweets: number;

@@ -40,6 +40,9 @@ export { AuditLogger, getAuditLogger } from './security/audit-logger';
 // Campaign orchestration (scheduler → live posting → analytics)
 export { CampaignRunner, CampaignStore, mapUIAnalytics } from './orchestrator';
 
+// Personas (LLM-driven agent voices for live accounts)
+export { PersonaAgent, createPersonaAgent, hoodintel } from './personas';
+
 // Performance utilities
 export { LRUCache, TieredCache } from './performance/cache';
 export { ConnectionPool, Connection } from './performance/connection-pool';

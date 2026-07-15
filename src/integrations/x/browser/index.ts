@@ -10,5 +10,6 @@ export type {
   ThreadResult,
   TweetData,
   UIAnalytics,
+  Mention,
   MediaUploadResult,
 } from './x-browser-types';

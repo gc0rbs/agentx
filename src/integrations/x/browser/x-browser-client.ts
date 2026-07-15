@@ -13,6 +13,7 @@ import type {
   ThreadResult,
   TweetData,
   UIAnalytics,
+  Mention,
 } from './x-browser-types';
 
 const logger = createLogger('x-browser');
@@ -382,6 +383,93 @@ export class XBrowserClient {
     } catch (error) {
       logger.error('Failed to retweet', error instanceof Error ? error : undefined);
       return false;
+    }
+  }
+
+  /**
+   * Reply to a tweet
+   */
+  async replyToTweet(tweetUrl: string, text: string): Promise<PostResult> {
+    if (!this.page) throw new Error('Browser not initialized');
+    if (!this.isLoggedIn) throw new Error('Not logged in');
+
+    try {
+      await this.page.goto(tweetUrl, { waitUntil: 'networkidle' });
+      await this.page.waitForTimeout(1500);
+
+      // The inline reply box on the tweet detail page
+      const replyBox = this.page.locator('[data-testid="tweetTextarea_0"]');
+      await replyBox.waitFor({ state: 'visible' });
+      await replyBox.click();
+      await this.page.keyboard.type(text, { delay: 20 });
+
+      const replyButton = this.page.locator('[data-testid="tweetButton"]');
+      await replyButton.waitFor({ state: 'visible' });
+      await replyButton.click();
+      await this.page.waitForTimeout(2500);
+
+      logger.info('Reply posted', { tweetUrl });
+      return { success: true };
+    } catch (error) {
+      logger.error('Failed to reply', error instanceof Error ? error : undefined);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
+  /**
+   * Scrape recent mentions from the notifications page
+   */
+  async getMentions(limit = 20): Promise<Mention[]> {
+    if (!this.page) throw new Error('Browser not initialized');
+    if (!this.isLoggedIn) throw new Error('Not logged in');
+
+    try {
+      await this.page.goto('https://x.com/notifications/mentions', {
+        waitUntil: 'networkidle',
+      });
+      await this.page.waitForTimeout(2500);
+
+      const articles = this.page.locator('article[data-testid="tweet"]');
+      const count = Math.min(await articles.count(), limit);
+      const mentions: Mention[] = [];
+
+      for (let i = 0; i < count; i++) {
+        const article = articles.nth(i);
+
+        const text = await article
+          .locator('[data-testid="tweetText"]')
+          .first()
+          .textContent()
+          .catch(() => null);
+        if (!text) continue;
+
+        // Tweet permalink: the <a> wrapping the timestamp
+        const href = await article
+          .locator('a:has(time)')
+          .first()
+          .getAttribute('href')
+          .catch(() => null);
+        if (!href) continue;
+
+        const idMatch = href.match(/status\/(\d+)/);
+        const authorMatch = href.match(/^\/([^/]+)\/status/);
+
+        mentions.push({
+          tweetId: idMatch?.[1] ?? href,
+          tweetUrl: `https://x.com${href}`,
+          author: authorMatch?.[1] ?? 'unknown',
+          text: text.trim(),
+        });
+      }
+
+      logger.info('Mentions scraped', { count: mentions.length });
+      return mentions;
+    } catch (error) {
+      logger.error('Failed to fetch mentions', error instanceof Error ? error : undefined);
+      return [];
     }
   }
 
