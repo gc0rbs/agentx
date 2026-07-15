@@ -1,79 +1,17 @@
 {
-  "timestamp": "2026-07-07T03:11:22.085Z",
-  "mode": "headless",
-  "workerType": "optimize",
-  "model": "sonnet",
-  "durationMs": 134951,
-  "executionId": "optimize_1783393747134_0qrtam",
-  "success": true,
-  "findings": {
-    "sections": [
-      {
-        "title": "Performance Analysis",
-        "content": "\nNote: this repo has **no React/frontend code** (0 `.tsx`/`.jsx` files) — it's a backend TypeScript agent-swarm (in-memory state, event bus, mock GCP/BigQuery clients). I looked at the closest real analogs instead: N+1-style repeated lookups in loops, \"over-render\"-equivalent state-broadcast overhead, unused caching infrastructure, unbounded memory growth, and redundant recomputation. Findings below are grounded in actual files/lines.\n\n",
-        "level": 2
-      },
-      {
-        "title": "1. N+1-style patterns",
-        "content": "\n**`src/agents/tier1/memory-agent.ts:413-452` — `consolidateMemory` is O(n²) plus per-match individual fetches**\n```ts\nfor (const entry of allEntries) {                       // O(n)\n  const similar = await this.vectorStore.search(entry.embedding, 5, threshold); // O(n) linear scan itself\n  for (const s of toMerge) {\n    const similarEntry = await this.vectorStore.retrieve(s.id);   // separate lookup per match\n    ...\n  }\n}\n```\n`search()` already does a full linear scan per call (see #5), so this function is effectively O(n²) — for 10k memory entries that's ~100M cosine-similarity ops per consolidation pass, run on a periodic timer (`memory-agent.ts:540`). Fix: batch-retrieve matched IDs in one pass (`vectorStore.getMany(ids)`), and only run consolidation over entries changed since the last pass.\n\n**`src/agents/tier2/risk-detection-agent.ts:207-211` — sequential await-in-loop over campaigns**\n```ts\nfor (const campaign of campaigns) {\n  const campaignAlerts = await this.analyzeSingleCampaign(campaign, context); // serialized\n  ...\n}\n```\nIf `analyzeSingleCampaign` ever calls out to a real data source (BigQuery, ad platform API), this becomes classic N+1 — one round trip per campaign instead of a batched query. Fix:\n```ts\nconst results = await Promise.all(campaigns.map(c => this.analyzeSingleCampaign(c, context)));\n```\n\n**Forward-looking**: `src/integrations/gcp/bigquery-client.ts` is currently a no-op mock. When it's wired to real BigQuery, watch every place that loops calling `.query()` per entity (campaigns, creatives) — use `WHERE id IN UNNEST(@ids)` batched queries, not per-ID calls.\n\n",
-        "level": 3
-      },
-      {
-        "title": "2. \"Unnecessary re-render\" equivalent: full-state clone on every mutation",
-        "content": "\n**`src/core/state-manager.ts:377-387` + `getState()` (100-110)**\n```ts\nprivate notifySubscribers(): void {\n  const stateCopy = this.getState();   // deep-clones ALL 4 Maps (agents, tasks, campaigns, creatives)\n  this.subscribers.forEach((callback) => callback(stateCopy));\n}\n```\nThis runs on **every single** `updateAgent`, `updateTask`, `addTask`, `updateCampaign`, etc. — and `BaseAgent.submitTask` (`base-agent.ts`) calls `stateManager.updateTask` multiple times per task (start, complete). With N tasks and M entities in state, you get O(N × M) clone work over a session — the same shape of problem as a React context re-rendering every subscriber on every keystroke. Fixes:\n- Only clone the Map that actually changed, not all four.\n- Debounce/batch notifications (e.g. via microtask) instead of firing synchronously per mutation.\n- Let subscribers register for specific slices (`subscribeToTasks`, `subscribeToAgents`) instead of full-state callbacks.\n\n",
-        "level": 3
-      },
-      {
-        "title": "3. Caching opportunities",
-        "content": "\n**`src/performance/cache.ts` builds `LRUCache`/`TieredCache`/`getCampaignCache()`/`getAnalyticsCache()` — but nothing in `src/services/*` actually calls them.**\n\n- `AnalyticsService.generateCampaignReport()` (`analytics-service.ts:99-123`) recomputes `analyzeTrends` + `generateCampaignInsights` from scratch on every call, even though `getAnalyticsCache()` exists unused.\n- `CampaignService.getOptimizationRecommendations()` (`campaign-service.ts:228-275`) does the same — no memoization despite being read-heavy (likely called on every dashboard refresh).\n\nExample fix:\n```ts\nasync generateCampaignReport(campaignId: string): Promise<PerformanceReport> {\n  return getAnalyticsCache().getOrSet(\n    `report:${campaignId}`,\n    async () => this.buildCampaignReport(campaignId),\n    30_000 // 30s TTL — reports don't need to be recomputed on every request\n  );\n}\n```\nInvalidate on the relevant event (`campaign.updated`, `analytics.metrics_recorded`) rather than relying purely on TTL.\n\n",
-        "level": 3
-      },
-      {
-        "title": "4. Memory leaks / unbounded growth",
-        "content": "\n**`src/core/event-bus.ts:279-284` — `eventStore` (per-aggregate event history) is never trimmed.**\n```ts\nprivate storeByAggregate(event: DomainEvent): void {\n  const events = this.eventStore.get(aggregateId) ?? [];\n  events.push(event);\n  this.eventStore.set(aggregateId, events);   // grows forever, no cap, no expiry\n}\n```\nUnlike `eventHistory` (capped at `maxEventHistory: 10000`, `event-bus.ts:271`), `eventStore` has no size limit per aggregate or eviction of old aggregate IDs. In a long-running process handling many campaigns/tasks, this is an unbounded Map — a genuine memory leak. Fix: cap per-aggregate array length and evict LRU aggregate IDs, or move to the existing `LRUCache`.\n\n**`src/agents/tier1/orchestrator-agent.ts:203-205` and `src/agents/tier2/risk-detection-agent.ts:637-639`** already correctly trim (`routingHistory`, `alertHistory` capped at 1000). Good pattern — just needs to be applied consistently to `eventStore` and to `StateManager.snapshots` if `startAutoSnapshot()` runs indefinitely (it's capped via `maxSnapshots`, so that one's fine — but each snapshot is a full deep clone per `createSnapshot()`, which combined with the 60s default interval means one O(n) clone every minute for the life of the process, compounding with #2).\n\n**`src/performance/cache.ts:198-205`** — `cleanupTimer.unref()` is good practice (doesn't block process exit), but there's no equivalent for `ConnectionPool`'s `idleCheckTimer` in terms of being stoppable if `drain()` is never called on shutdown — worth confirming callers always call `.drain()`/`.stop()`.\n\n",
-        "level": 3
-      },
-      {
-        "title": "5. Redundant computations",
-        "content": "**`src/agents/tier1/memory-agent.ts` `VectorStore.search()` and `src/agents/tier2/historical-memory-agent.ts` `HistoricalStore` — brute-force O(n) cosine similarity despite doc comments claiming \"HNSW-powered similarity search\".**\n```ts\nasync search(query: number[], limit = 10, minScore = 0.5): Promise<SimilarityResult[]> {\n  for (const [id, embedding] of this.embeddings) {   // scans every stored vector, every call\n    const score = this.cosineSimilarity(query, embedding);\n    ...\n  }\n}\n```\nThis recomputes full similarity against every entry on every search — no actual index. Given CLAUDE.md/docs advertise HNSW-based 150x speedups elsewhere in this project, this mock implementation is the actual bottleneck once entry counts grow past a few thousand. If a real HNSW library (e.g. via the referenced agentdb/ruvector integration) isn't wired in yet, that's the highest-leverage fix in this codebase.\n\n**`src/services/analytics-service.ts:76-85` `recordMetrics`** filters the entire history array by a 90-day cutoff on every single write:\n```ts\nrecordMetrics(entityId: string, metrics: MetricSnapshot): void {\n  const history = this.metricHistory.get(entityId) || [];\n  history.push(metrics);\n  const filtered = history.filter((m) => m.timestamp >= cutoff); // O(n) every write\n  this.metricHistory.set(entityId, filtered);\n}\n```\nFor frequent metric writes (e.g. per-hour snapshots × many campaigns), this is a full array scan per insert. Fix: only run the cutoff-trim periodically (e.g. every Nth write or on a timer) rather than on every single `recordMetrics` call, since a few stale entries lingering briefly is harmless.\n\n**`src/services/analytics-service.ts:301-340` `analyzeTrends`** recomputes `history.map(...)` three separate times per metric (`calculateTrend` called 5×, each doing its own `.map()` over the same `history` array) — could compute all 5 metric arrays in a single pass instead of 5 independent `.map()` traversals, though at typical history sizes (≤90 entries) this is minor compared to the two issues above.\n\n---\n\n**Priority order if you want to fix a few things first:**\n1. `event-bus.ts` `eventStore` unbounded growth (real leak)\n2. `state-manager.ts` full-clone-per-mutation (compounds with everything else)\n3. Wire an actual vector index into `VectorStore`/`HistoricalStore` before entry counts grow\n4. Hook the existing `LRUCache` into `AnalyticsService`/`CampaignService` (infrastructure already built, just unused)\n5. Parallelize the `risk-detection-agent.ts` campaign scan loop",
-        "level": 3
-      }
-    ],
-    "codeBlocks": [
-      {
-        "language": "ts",
-        "code": "for (const entry of allEntries) {                       // O(n)\n  const similar = await this.vectorStore.search(entry.embedding, 5, threshold); // O(n) linear scan itself\n  for (const s of toMerge) {\n    const similarEntry = await this.vectorStore.retrieve(s.id);   // separate lookup per match\n    ...\n  }\n}"
-      },
-      {
-        "language": "ts",
-        "code": "for (const campaign of campaigns) {\n  const campaignAlerts = await this.analyzeSingleCampaign(campaign, context); // serialized\n  ...\n}"
-      },
-      {
-        "language": "ts",
-        "code": "const results = await Promise.all(campaigns.map(c => this.analyzeSingleCampaign(c, context)));"
-      },
-      {
-        "language": "ts",
-        "code": "private notifySubscribers(): void {\n  const stateCopy = this.getState();   // deep-clones ALL 4 Maps (agents, tasks, campaigns, creatives)\n  this.subscribers.forEach((callback) => callback(stateCopy));\n}"
-      },
-      {
-        "language": "ts",
-        "code": "async generateCampaignReport(campaignId: string): Promise<PerformanceReport> {\n  return getAnalyticsCache().getOrSet(\n    `report:${campaignId}`,\n    async () => this.buildCampaignReport(campaignId),\n    30_000 // 30s TTL — reports don't need to be recomputed on every request\n  );\n}"
-      },
-      {
-        "language": "ts",
-        "code": "private storeByAggregate(event: DomainEvent): void {\n  const events = this.eventStore.get(aggregateId) ?? [];\n  events.push(event);\n  this.eventStore.set(aggregateId, events);   // grows forever, no cap, no expiry\n}"
-      },
-      {
-        "language": "ts",
-        "code": "async search(query: number[], limit = 10, minScore = 0.5): Promise<SimilarityResult[]> {\n  for (const [id, embedding] of this.embeddings) {   // scans every stored vector, every call\n    const score = this.cosineSimilarity(query, embedding);\n    ...\n  }\n}"
-      },
-      {
-        "language": "ts",
-        "code": "recordMetrics(entityId: string, metrics: MetricSnapshot): void {\n  const history = this.metricHistory.get(entityId) || [];\n  history.push(metrics);\n  const filtered = history.filter((m) => m.timestamp >= cutoff); // O(n) every write\n  this.metricHistory.set(entityId, filtered);\n}"
-      }
-    ]
+  "timestamp": "2026-07-15T16:58:14.041Z",
+  "mode": "local",
+  "memoryUsage": {
+    "rss": 83468288,
+    "heapTotal": 21381120,
+    "heapUsed": 19139080,
+    "external": 3860365,
+    "arrayBuffers": 92734
   },
-  "rawOutputPreview": "## Performance Analysis\n\nNote: this repo has **no React/frontend code** (0 `.tsx`/`.jsx` files) — it's a backend TypeScript agent-swarm (in-memory state, event bus, mock GCP/BigQuery clients). I looked at the closest real analogs instead: N+1-style repeated lookups in loops, \"over-render\"-equivalent state-broadcast overhead, unused caching infrastructure, unbounded memory growth, and redundant recomputation. Findings below are grounded in actual files/lines.\n\n### 1. N+1-style patterns\n\n**`src/agents/tier1/memory-agent.ts:413-452` — `consolidateMemory` is O(n²) plus per-match individual fetches**\n```ts\nfor (const entry of allEntries) {                       // O(n)\n  const similar = await this.vectorStore.search(entry.embedding, 5, threshold); // O(n) linear scan itself\n  for (const s of toMerge) {\n    const similarEntry = await this.vectorStore.retrieve(s.id);   // separate lookup per match\n    ...\n  }\n}\n```\n`search()` already does a full linear scan per call (see #5), so this function is effectively O(n²) — for 10k memory entries that's ~100M cosine-similarity ops per consolidation pass, run on a periodic timer (`memory-agent.ts:540`). Fix: batch-retrieve matched IDs in one pass (`vectorStore.getMany(ids)`), and only run consolidation over entries changed since the last pass.\n\n**`src/agents/tier2/risk-detection-agent.ts:207-211` — sequential await-in-loop over campaigns**\n```ts\nfor (const campaign of campaigns) {\n  const campaignAlerts = await this.analyzeSingleCampaign(campaign, context); // serialized\n  ...\n}\n```\nIf `analyzeSingleCampaign` ever calls out to a real data source (BigQuery, ad platform API), this becomes classic N+1 — one round trip per campaign instead of a batched query. Fix:\n```ts\nconst results = await Promise.all(campaigns.map(c => this.analyzeSingleCampaign(c, context)));\n```\n\n**Forward-looking**: `src/integrations/gcp/bigquery-client.ts` is currently a no-op mock. When it's wired to real BigQuery, watch every place that loops calling `.query()`",
-  "rawOutputLength": 8323
+  "uptime": 240.899593973,
+  "optimizations": {
+    "cacheHitRate": 0.78,
+    "avgResponseTime": 45
+  },
+  "note": "Install Claude Code CLI for AI-powered optimization suggestions"
 }

@@ -1,15 +1,12 @@
 {
-  "timestamp": "2026-07-07T03:08:50.959Z",
-  "mode": "headless",
-  "workerType": "audit",
-  "model": "haiku",
-  "durationMs": 103825,
-  "executionId": "audit_1783393627134_ystfib",
-  "success": true,
-  "findings": {
-    "parseError": true,
-    "rawOutput": "## Security Audit Complete\n\nI've analyzed the codebase and generated a comprehensive security report. **Risk Score: 72/100** (MEDIUM-HIGH)\n\n### Key Findings\n\n**3 HIGH Severity Issues:**\n1. **Command Injection** (.claude/helpers/github-safe.js:67) — Arguments joined without escaping; attackers can inject shell commands\n2. **Unencrypted Data Storage** (.claude/helpers/memory.js) — Sensitive campaign data, API responses, and session state stored as plaintext JSON\n3. **Insecure Session Storage** (examples/x-automation/post-tweet.ts:30) — X authentication credentials persisted unencrypted to disk; tokens extractable\n\n**3 MEDIUM Issues:**\n- Predictable session IDs using timestamps (can be enumerated)\n- No input validation in memory agents (allows stored XSS)\n- PII exposure storing raw IPs and user agents without hashing\n\n**1 LOW Issue:**\n- Overly permissive temp file creation (world-readable files)\n\n### Top Recommendations\n1. Encrypt sensitive data at rest (AES-256-GCM)\n2. Use cryptographically secure session IDs (`crypto.randomBytes(32)`)\n3. Add Zod schema validation for all agent inputs\n4. Hash PII before storage\n5. Escape shell commands properly with `shell-quote` package\n6. Set file permissions to 0600 (owner only)\n\nReports provided in both HTML (visual) and JSON (machine-readable) formats.\n"
+  "timestamp": "2026-07-15T16:56:14.041Z",
+  "mode": "local",
+  "checks": {
+    "envFilesProtected": true,
+    "gitIgnoreExists": true,
+    "noHardcodedSecrets": true
   },
-  "rawOutputPreview": "## Security Audit Complete\n\nI've analyzed the codebase and generated a comprehensive security report. **Risk Score: 72/100** (MEDIUM-HIGH)\n\n### Key Findings\n\n**3 HIGH Severity Issues:**\n1. **Command Injection** (.claude/helpers/github-safe.js:67) — Arguments joined without escaping; attackers can inject shell commands\n2. **Unencrypted Data Storage** (.claude/helpers/memory.js) — Sensitive campaign data, API responses, and session state stored as plaintext JSON\n3. **Insecure Session Storage** (examples/x-automation/post-tweet.ts:30) — X authentication credentials persisted unencrypted to disk; tokens extractable\n\n**3 MEDIUM Issues:**\n- Predictable session IDs using timestamps (can be enumerated)\n- No input validation in memory agents (allows stored XSS)\n- PII exposure storing raw IPs and user agents without hashing\n\n**1 LOW Issue:**\n- Overly permissive temp file creation (world-readable files)\n\n### Top Recommendations\n1. Encrypt sensitive data at rest (AES-256-GCM)\n2. Use cryptographically secure session IDs (`crypto.randomBytes(32)`)\n3. Add Zod schema validation for all agent inputs\n4. Hash PII before storage\n5. Escape shell commands properly with `shell-quote` package\n6. Set file permissions to 0600 (owner only)\n\nReports provided in both HTML (visual) and JSON (machine-readable) formats.\n",
-  "rawOutputLength": 1310
+  "riskLevel": "low",
+  "recommendations": [],
+  "note": "Install Claude Code CLI for AI-powered security analysis"
 }
