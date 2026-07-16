@@ -10,6 +10,10 @@ export interface XBrowserConfig {
   /** Override the Chromium binary (e.g. a pre-installed browser). Falls back to
    *  PLAYWRIGHT_CHROMIUM_PATH env, then Playwright's bundled browser. */
   executablePath?: string;
+  /** Route browser traffic through a proxy (e.g. a residential proxy for a
+   *  residential exit IP). Falls back to the PROXY_URL env
+   *  (http://user:pass@host:port). */
+  proxy?: { server: string; username?: string; password?: string };
 }
 
 export interface XCredentials {

@@ -43,11 +43,14 @@ export class XBrowserClient {
    */
   async init(): Promise<void> {
     const executablePath = this.config.executablePath ?? process.env.PLAYWRIGHT_CHROMIUM_PATH;
+    const proxy = this.resolveProxy();
     this.browser = await chromium.launch({
       headless: this.config.headless,
       slowMo: this.config.slowMo,
       ...(executablePath ? { executablePath } : {}),
+      ...(proxy ? { proxy } : {}),
     });
+    if (proxy) logger.info('Routing browser through proxy', { server: proxy.server });
 
     const contextOptions: Record<string, unknown> = {
       viewport: { width: 1280, height: 800 },
@@ -169,6 +172,27 @@ export class XBrowserClient {
     } catch (error) {
       logger.error('Cookie auth failed', error instanceof Error ? error : undefined);
       return false;
+    }
+  }
+
+  /**
+   * Resolve proxy from explicit config, else from the PROXY_URL env
+   * (http://user:pass@host:port). Returns undefined if none configured.
+   */
+  private resolveProxy(): { server: string; username?: string; password?: string } | undefined {
+    if (this.config.proxy) return this.config.proxy;
+    const url = process.env.PROXY_URL;
+    if (!url) return undefined;
+    try {
+      const u = new URL(url);
+      const server = `${u.protocol}//${u.host}`;
+      const proxy: { server: string; username?: string; password?: string } = { server };
+      if (u.username) proxy.username = decodeURIComponent(u.username);
+      if (u.password) proxy.password = decodeURIComponent(u.password);
+      return proxy;
+    } catch {
+      logger.warn('PROXY_URL is set but not a valid URL, ignoring');
+      return undefined;
     }
   }
 
