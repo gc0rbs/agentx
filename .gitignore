@@ -48,3 +48,6 @@ data/
 
 # Deploy secrets (live session cookie)
 deploy/.env
+
+# claude-flow daemon runtime state/metrics — rewritten continuously, not source
+.claude-flow/
