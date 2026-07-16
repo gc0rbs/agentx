@@ -4,6 +4,8 @@
 # Env:
 #   RUN_MODE          arc | persona   (default: arc)
 #   PERSONA           persona id for persona mode (default: mizukara)
+#   ARC_START_AT      optional relative (+10m/+2h) or ISO datetime anchor for arc
+#                      generation; takes precedence over ARC_START_DATE
 #   ARC_START_DATE    optional YYYY-MM-DD for arc generation (default: tomorrow)
 #   X_AUTH_TOKEN      X session cookie (required)
 #   ANTHROPIC_API_KEY required for persona mode (LLM generation); arc mode does not need it
@@ -23,8 +25,9 @@ case "$MODE" in
   arc)
     # Generate the scripted arc if it isn't already on the persisted volume.
     if [[ ! -f ./data/mizukara-launch.json ]]; then
-      echo "generating arc (start=${ARC_START_DATE:-tomorrow})..."
-      npx tsx examples/x-automation/generate-mizukara-launch.ts ${ARC_START_DATE:-}
+      START="${ARC_START_AT:-${ARC_START_DATE:-}}"
+      echo "generating arc (start=${START:-tomorrow})..."
+      npx tsx examples/x-automation/generate-mizukara-launch.ts "$START"
     else
       echo "arc file already present on volume, reusing it"
     fi

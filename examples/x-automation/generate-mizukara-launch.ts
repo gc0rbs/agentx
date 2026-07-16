@@ -13,8 +13,15 @@
  *   day 4  rhythm + thesis restatement (arc button)
  *
  * Usage:
- *   npx tsx examples/x-automation/generate-mizukara-launch.ts [start-date]
+ *   npx tsx examples/x-automation/generate-mizukara-launch.ts [start]
  *   → writes ./data/mizukara-launch.json (SocialPost[] for the campaign runner)
+ *
+ *   [start] accepts:
+ *     (empty)        tomorrow at midnight, calendar-day spacing (default)
+ *     YYYY-MM-DD     that calendar date at midnight, calendar-day spacing
+ *     +10m / +2h     relative anchor — first post fires N minutes/hours from now,
+ *                    remaining posts keep their original relative spacing
+ *     ISO datetime    anchor at that exact instant, same relative spacing
  *
  * Then (after approval):
  *   npx tsx examples/x-automation/run-campaign.ts ./data/mizukara-launch.json
@@ -122,11 +129,51 @@ const SEQUENCE: ScriptedPost[] = [
   },
 ];
 
-function buildPosts(startDate: Date): SocialPost[] {
+type Start = { mode: 'date'; date: Date } | { mode: 'anchor'; at: Date };
+
+function resolveStart(arg?: string): Start {
+  if (!arg) {
+    const date = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    date.setHours(0, 0, 0, 0);
+    return { mode: 'date', date };
+  }
+
+  const relative = arg.match(/^\+(\d+)([mh])$/);
+  if (relative) {
+    const amount = Number(relative[1]);
+    const unitMs = relative[2] === 'm' ? 60_000 : 60 * 60_000;
+    return { mode: 'anchor', at: new Date(Date.now() + amount * unitMs) };
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(arg)) {
+    const date = new Date(arg);
+    date.setHours(0, 0, 0, 0);
+    return { mode: 'date', date };
+  }
+
+  const parsed = new Date(arg);
+  if (!Number.isNaN(parsed.getTime())) {
+    return { mode: 'anchor', at: parsed };
+  }
+
+  throw new Error(`Unrecognized start argument: "${arg}"`);
+}
+
+const FIRST_OFFSET_MIN = SEQUENCE[0].day * 1440 + SEQUENCE[0].hour * 60;
+
+function buildPosts(start: Start): SocialPost[] {
   return SEQUENCE.map((p, i) => {
-    const publishAt = new Date(startDate);
-    publishAt.setDate(publishAt.getDate() + p.day);
-    publishAt.setHours(p.hour, Math.floor(Math.random() * 20), 0, 0);
+    let publishAt: Date;
+
+    if (start.mode === 'date') {
+      publishAt = new Date(start.date);
+      publishAt.setDate(publishAt.getDate() + p.day);
+      publishAt.setHours(p.hour, Math.floor(Math.random() * 20), 0, 0);
+    } else {
+      const offsetMin = p.day * 1440 + p.hour * 60 - FIRST_OFFSET_MIN;
+      const jitterMs = Math.floor(Math.random() * 90_000); // 0-90s
+      publishAt = new Date(start.at.getTime() + offsetMin * 60_000 + jitterMs);
+    }
 
     return {
       id: `mizukara-launch-${String(i + 1).padStart(3, '0')}`,
@@ -148,15 +195,15 @@ function buildPosts(startDate: Date): SocialPost[] {
 }
 
 function main() {
-  const startArg = process.argv[2];
-  const start = startArg ? new Date(startArg) : new Date(Date.now() + 24 * 60 * 60 * 1000);
-  start.setHours(0, 0, 0, 0);
-
+  const start = resolveStart(process.argv[2]);
   const posts = buildPosts(start);
   mkdirSync('./data', { recursive: true });
   writeFileSync('./data/mizukara-launch.json', JSON.stringify(posts, null, 2));
 
-  console.log(`Generated ${posts.length} posts over 5 days, starting ${start.toDateString()}`);
+  const startDescription =
+    start.mode === 'date' ? `starting ${start.date.toDateString()}` : `anchored at ${start.at.toISOString()}`;
+  console.log(`Generated ${posts.length} posts over 5 days, ${startDescription}`);
+  console.log(`First post scheduled for: ${posts[0].schedule.publishAt.toISOString()}`);
   console.log('Written to ./data/mizukara-launch.json');
   console.log('\nReview the file, then (after approval):');
   console.log('  npx tsx examples/x-automation/run-campaign.ts ./data/mizukara-launch.json');

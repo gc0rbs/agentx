@@ -4,7 +4,9 @@
 #
 # Dashboard setup required (one time):
 #   1. Variables: set X_AUTH_TOKEN (required). For RUN_MODE=persona also set
-#      ANTHROPIC_API_KEY. Optional: RUN_MODE (arc|persona), PERSONA, ARC_START_DATE.
+#      ANTHROPIC_API_KEY. Optional: RUN_MODE (arc|persona), PERSONA, ARC_START_AT
+#      (relative +10m/+2h or ISO datetime, takes precedence over ARC_START_DATE),
+#      ARC_START_DATE (YYYY-MM-DD).
 #   2. Volume: mount a volume at /app/data so the X session cookie and campaign
 #      state survive restarts and redeploys.
 
