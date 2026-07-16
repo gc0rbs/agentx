@@ -59,10 +59,11 @@ async function main() {
   const demo = args.includes('--demo');
   const postsPath = args.find((a) => !a.startsWith('--'));
 
+  const authToken = process.env.X_AUTH_TOKEN;
   const username = process.env.X_USERNAME;
   const password = process.env.X_PASSWORD;
-  if (!username || !password) {
-    console.error('Set X_USERNAME and X_PASSWORD environment variables');
+  if (!authToken && (!username || !password)) {
+    console.error('Set X_AUTH_TOKEN, or X_USERNAME + X_PASSWORD');
     process.exit(1);
   }
 
@@ -94,8 +95,14 @@ async function main() {
 
   const hasSession = await x.checkSession();
   if (!hasSession) {
-    console.log('Logging in...');
-    const ok = await x.login({ username, password, email: process.env.X_EMAIL });
+    let ok = false;
+    if (authToken) {
+      console.log('Authenticating via auth_token cookie...');
+      ok = await x.loginWithCookie(authToken);
+    } else {
+      console.log('Logging in...');
+      ok = await x.login({ username: username!, password: password!, email: process.env.X_EMAIL });
+    }
     if (!ok) {
       console.error('Login failed — run post-tweet.ts with headless:false to debug');
       await x.close();

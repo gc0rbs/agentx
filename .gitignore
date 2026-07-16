@@ -45,3 +45,6 @@ npm-debug.log*
 
 # Runtime data: campaign state, browser sessions (contains login cookies — never commit)
 data/
+
+# Deploy secrets (live session cookie)
+deploy/.env

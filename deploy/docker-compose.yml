@@ -1,0 +1,24 @@
+# Plain-VPS / local Docker alternative to Railway.
+#
+#   cd deploy
+#   cp .env.example .env    # then fill in X_AUTH_TOKEN (+ ANTHROPIC_API_KEY for persona mode)
+#   docker compose up -d --build
+#   docker compose logs -f
+#
+# The named volume persists the X session cookie and campaign state across restarts.
+
+services:
+  runner:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    env_file: .env
+    environment:
+      RUN_MODE: ${RUN_MODE:-arc}
+      PERSONA: ${PERSONA:-mizukara}
+    volumes:
+      - runner-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  runner-data:
