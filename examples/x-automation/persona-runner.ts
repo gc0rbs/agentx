@@ -6,9 +6,9 @@
  *   2. On a paced schedule, generate original posts from the persona's topic rotation
  *
  * Usage:
- *   npx tsx examples/x-automation/persona-runner.ts --persona mizukara --dry-run
- *   npx tsx examples/x-automation/persona-runner.ts --persona mizukara --once
- *   npx tsx examples/x-automation/persona-runner.ts --persona mizukara
+ *   npx tsx examples/x-automation/persona-runner.ts --persona hoodintel --dry-run
+ *   npx tsx examples/x-automation/persona-runner.ts --persona hoodintel --once
+ *   npx tsx examples/x-automation/persona-runner.ts --persona hoodintel
  *
  * Auth (in priority order):
  *   X_AUTH_TOKEN   — X session cookie (preferred; skips password + 2FA)

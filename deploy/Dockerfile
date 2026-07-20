@@ -1,4 +1,4 @@
-# Mizukara / persona runner — container image for Railway or any Docker host.
+# Persona runner — container image for Railway or any Docker host.
 # Playwright base image ships Chromium + system deps at the version we pin to.
 FROM mcr.microsoft.com/playwright:v1.61.1-jammy
 
@@ -18,9 +18,7 @@ COPY . .
 RUN mkdir -p /app/data
 ENV NODE_ENV=production
 
-# RUN_MODE selects what the container runs (see entrypoint.sh):
-#   arc      → the scripted mizukara launch sequence (default)
-#   persona  → ongoing persona behavior (topic rotation + mention replies)
-ENV RUN_MODE=arc
+# PERSONA selects which persona the runner drives (see entrypoint.sh)
+ENV PERSONA=hoodintel
 
 ENTRYPOINT ["bash", "deploy/entrypoint.sh"]

@@ -41,7 +41,7 @@ export { AuditLogger, getAuditLogger } from './security/audit-logger';
 export { CampaignRunner, CampaignStore, mapUIAnalytics } from './orchestrator';
 
 // Personas (LLM-driven agent voices for live accounts)
-export { PersonaAgent, createPersonaAgent, hoodintel, mizukara, getPersona, PERSONAS } from './personas';
+export { PersonaAgent, createPersonaAgent, hoodintel, getPersona, PERSONAS } from './personas';
 
 // Performance utilities
 export { LRUCache, TieredCache } from './performance/cache';

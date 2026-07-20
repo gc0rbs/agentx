@@ -1,11 +1,11 @@
 # Railway deployment config.
 # Build from the Dockerfile in deploy/. The container entrypoint runs the
-# persona/campaign runner (see deploy/entrypoint.sh).
+# persona runner (see deploy/entrypoint.sh).
 #
 # Dashboard setup required (one time):
-#   1. Variables: set X_AUTH_TOKEN (required). For RUN_MODE=persona also set
-#      ANTHROPIC_API_KEY. Optional: RUN_MODE (arc|persona), PERSONA, ARC_START_DATE.
-#   2. Volume: mount a volume at /app/data so the X session cookie and campaign
+#   1. Variables: set X_AUTH_TOKEN and ANTHROPIC_API_KEY (both required).
+#      Optional: PERSONA (default: hoodintel), PROXY_URL.
+#   2. Volume: mount a volume at /app/data so the X session cookie and runner
 #      state survive restarts and redeploys.
 
 [build]
