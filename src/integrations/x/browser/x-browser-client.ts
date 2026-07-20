@@ -248,7 +248,11 @@ export class XBrowserClient {
         });
       }
       return this.isLoggedIn;
-    } catch {
+    } catch (error) {
+      logger.error(
+        'Session check navigation failed',
+        error instanceof Error ? error : undefined
+      );
       return false;
     }
   }
