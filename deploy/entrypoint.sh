@@ -24,6 +24,13 @@ fi
 # Run headed under a virtual display — X serves a bot interstitial to headless
 # Chromium, which breaks cookie auth. Start Xvfb directly (not xvfb-run, whose
 # wrapper buffers/redirects the child's stdout and hides our logs).
+#
+# Railway's restart policy relaunches the entrypoint inside the SAME container
+# after a crash rather than recreating it, so /tmp survives restarts and a
+# previous Xvfb's lock file lingers even though that process is dead. Clear it
+# before starting or every restart after the first fails with "Server is
+# already active for display 99".
+rm -f /tmp/.X99-lock
 Xvfb :99 -screen 0 1280x800x24 -nolisten tcp &
 XVFB_PID=$!
 export DISPLAY=:99
