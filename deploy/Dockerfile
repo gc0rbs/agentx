@@ -5,8 +5,8 @@ FROM mcr.microsoft.com/playwright:v1.61.1-jammy
 WORKDIR /app
 
 # Xvfb lets us run Chromium headed (X flags headless and serves a bot page).
-# The Playwright base usually ships it; install explicitly to be safe.
-RUN apt-get update && apt-get install -y --no-install-recommends xvfb \
+# curl is used for network diagnostics in entrypoint.sh.
+RUN apt-get update && apt-get install -y --no-install-recommends xvfb curl \
   && rm -rf /var/lib/apt/lists/*
 
 # Install dependencies first (better layer caching)

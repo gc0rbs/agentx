@@ -40,4 +40,17 @@ if ! kill -0 "$XVFB_PID" 2>/dev/null; then
   exit 1
 fi
 echo "Xvfb up on :99 (pid ${XVFB_PID}), starting runner"
+
+# Diagnostic: raw curl probes below Chromium/Playwright, to tell a container
+# network/TLS problem apart from an X-specific block. Remove once resolved.
+echo "--- net probe: example.com ---"
+curl -sS -m 10 -o /dev/null -w 'http_code=%{http_code} http_version=%{http_version}\n' https://example.com/ || echo "curl example.com failed rc=$?"
+echo "--- net probe: x.com (direct) ---"
+curl -sS -m 10 -D - -o /dev/null https://x.com/ 2>&1 | head -20
+if [[ -n "${PROXY_URL:-}" ]]; then
+  echo "--- net probe: x.com (via PROXY_URL) ---"
+  curl -sS -m 15 -x "$PROXY_URL" -D - -o /dev/null https://x.com/ 2>&1 | head -20
+fi
+echo "--- net probes done ---"
+
 exec npx tsx examples/x-automation/persona-runner.ts --persona "$PERSONA"
