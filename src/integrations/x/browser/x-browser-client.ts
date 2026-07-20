@@ -209,7 +209,25 @@ export class XBrowserClient {
       const homeLink = this.page.locator('a[data-testid="AppTabBar_Home_Link"]');
       this.isLoggedIn = await homeLink.isVisible({ timeout: 5000 }).catch(() => false);
 
-      logger.info('Session check', { isLoggedIn: this.isLoggedIn });
+      if (this.isLoggedIn) {
+        logger.info('Session check', { isLoggedIn: true });
+      } else {
+        // Surface what X actually served so we can tell a stale cookie
+        // (logged-out landing) from an IP/device challenge (access page).
+        const landingUrl = this.page.url();
+        const title = await this.page.title().catch(() => '');
+        const loginVisible = await this.page
+          .locator('a[data-testid="loginButton"], a[href="/login"]')
+          .first()
+          .isVisible({ timeout: 1500 })
+          .catch(() => false);
+        logger.info('Session check', {
+          isLoggedIn: false,
+          landingUrl,
+          title,
+          loginVisible,
+        });
+      }
       return this.isLoggedIn;
     } catch {
       return false;
