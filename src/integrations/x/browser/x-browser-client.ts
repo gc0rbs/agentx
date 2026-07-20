@@ -47,6 +47,15 @@ export class XBrowserClient {
     this.browser = await chromium.launch({
       headless: this.config.headless,
       slowMo: this.config.slowMo,
+      // Reduce automation fingerprint. X serves a bot interstitial (blank page,
+      // empty <title>) to browsers it flags, which breaks cookie auth. These
+      // args + the init script below mask the most obvious headless signals;
+      // running headed under Xvfb (see deploy/entrypoint.sh) covers the rest.
+      args: [
+        '--disable-blink-features=AutomationControlled',
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
+      ],
       ...(executablePath ? { executablePath } : {}),
       ...(proxy ? { proxy } : {}),
     });
@@ -54,6 +63,8 @@ export class XBrowserClient {
 
     const contextOptions: Record<string, unknown> = {
       viewport: { width: 1280, height: 800 },
+      locale: 'en-US',
+      timezoneId: 'America/New_York',
       userAgent:
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     };
@@ -70,6 +81,10 @@ export class XBrowserClient {
     }
 
     this.context = await this.browser.newContext(contextOptions);
+    // Hide navigator.webdriver, which X checks to detect automation.
+    await this.context.addInitScript(() => {
+      Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+    });
     this.page = await this.context.newPage();
     this.page.setDefaultTimeout(this.config.timeout || 30000);
 
@@ -221,11 +236,15 @@ export class XBrowserClient {
           .first()
           .isVisible({ timeout: 1500 })
           .catch(() => false);
+        const bodyText = (await this.page.locator('body').innerText().catch(() => ''))
+          .slice(0, 160)
+          .replace(/\s+/g, ' ');
         logger.info('Session check', {
           isLoggedIn: false,
           landingUrl,
           title,
           loginVisible,
+          bodyText,
         });
       }
       return this.isLoggedIn;

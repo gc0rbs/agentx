@@ -21,4 +21,7 @@ if [[ -z "${ANTHROPIC_API_KEY:-}" ]]; then
   exit 1
 fi
 
-exec npx tsx examples/x-automation/persona-runner.ts --persona "$PERSONA"
+# Run headed under a virtual display — X serves a bot interstitial to headless
+# Chromium, which breaks cookie auth. xvfb-run provides the display.
+exec xvfb-run -a --server-args="-screen 0 1280x800x24" \
+  npx tsx examples/x-automation/persona-runner.ts --persona "$PERSONA"

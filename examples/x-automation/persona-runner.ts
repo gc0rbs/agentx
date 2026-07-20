@@ -105,8 +105,11 @@ async function main() {
     process.exit(1);
   }
 
+  // Default to headed — X flags headless Chromium and serves a bot page that
+  // breaks cookie auth. The container runs this under Xvfb (see entrypoint).
+  // Set HEADLESS=true to override (e.g. local dry testing).
   const x = createXBrowserClient({
-    headless: true,
+    headless: process.env.HEADLESS === 'true',
     userDataDir: `./data/${persona.id}-session`,
   });
 
