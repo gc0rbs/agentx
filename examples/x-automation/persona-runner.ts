@@ -24,7 +24,12 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { createXBrowserClient } from '../../src/integrations/x';
 import { createPersonaAgent, getPersona } from '../../src/personas';
 
-const POLL_INTERVAL_MS = 10 * 60 * 1000; // 10 min
+// Default 10 min — polling notifications faster than that is a strong bot
+// signal to X if left on indefinitely. Override with POLL_INTERVAL_SECONDS
+// only for short-lived testing, then unset it.
+const POLL_INTERVAL_MS = process.env.POLL_INTERVAL_SECONDS
+  ? Number(process.env.POLL_INTERVAL_SECONDS) * 1000
+  : 10 * 60 * 1000;
 
 interface AgentState {
   repliedTweetIds: string[];
