@@ -103,7 +103,7 @@ export class XBrowserClient {
     if (!this.page) throw new Error('Browser not initialized');
 
     try {
-      await this.page.goto(LOGIN_URL, { waitUntil: 'networkidle' });
+      await this.page.goto(LOGIN_URL, { waitUntil: 'domcontentloaded' });
       await this.page.waitForTimeout(2000);
 
       // Enter username
@@ -223,7 +223,7 @@ export class XBrowserClient {
     if (!this.page) throw new Error('Browser not initialized');
 
     try {
-      await this.page.goto(X_URL, { waitUntil: 'networkidle' });
+      await this.page.goto(X_URL, { waitUntil: 'domcontentloaded' });
       await this.page.waitForTimeout(2000);
 
       const homeLink = this.page.locator('a[data-testid="AppTabBar_Home_Link"]');
@@ -286,7 +286,7 @@ export class XBrowserClient {
     if (!this.isLoggedIn) throw new Error('Not logged in');
 
     try {
-      await this.page.goto(COMPOSE_URL, { waitUntil: 'networkidle' });
+      await this.page.goto(COMPOSE_URL, { waitUntil: 'domcontentloaded' });
       await this.page.waitForTimeout(1500);
 
       // Find tweet compose box
@@ -341,7 +341,7 @@ export class XBrowserClient {
     const results: PostResult[] = [];
 
     try {
-      await this.page.goto(COMPOSE_URL, { waitUntil: 'networkidle' });
+      await this.page.goto(COMPOSE_URL, { waitUntil: 'domcontentloaded' });
       await this.page.waitForTimeout(1500);
 
       for (let i = 0; i < tweets.length; i++) {
@@ -400,7 +400,7 @@ export class XBrowserClient {
     if (!this.isLoggedIn) throw new Error('Not logged in');
 
     try {
-      await this.page.goto(tweetUrl, { waitUntil: 'networkidle' });
+      await this.page.goto(tweetUrl, { waitUntil: 'domcontentloaded' });
       await this.page.waitForTimeout(2000);
 
       const parseMetric = async (testId: string): Promise<number> => {
@@ -461,7 +461,7 @@ export class XBrowserClient {
     if (!this.isLoggedIn) throw new Error('Not logged in');
 
     try {
-      await this.page.goto(tweetUrl, { waitUntil: 'networkidle' });
+      await this.page.goto(tweetUrl, { waitUntil: 'domcontentloaded' });
       await this.page.waitForTimeout(1500);
 
       const likeButton = this.page.locator('[data-testid="like"]');
@@ -484,7 +484,7 @@ export class XBrowserClient {
     if (!this.isLoggedIn) throw new Error('Not logged in');
 
     try {
-      await this.page.goto(tweetUrl, { waitUntil: 'networkidle' });
+      await this.page.goto(tweetUrl, { waitUntil: 'domcontentloaded' });
       await this.page.waitForTimeout(1500);
 
       const retweetButton = this.page.locator('[data-testid="retweet"]');
@@ -512,7 +512,7 @@ export class XBrowserClient {
     if (!this.isLoggedIn) throw new Error('Not logged in');
 
     try {
-      await this.page.goto(tweetUrl, { waitUntil: 'networkidle' });
+      await this.page.goto(tweetUrl, { waitUntil: 'domcontentloaded' });
       await this.page.waitForTimeout(1500);
 
       // The inline reply box on the tweet detail page
@@ -546,7 +546,7 @@ export class XBrowserClient {
 
     try {
       await this.page.goto('https://x.com/notifications/mentions', {
-        waitUntil: 'networkidle',
+        waitUntil: 'domcontentloaded',
       });
       await this.page.waitForTimeout(2500);
 
