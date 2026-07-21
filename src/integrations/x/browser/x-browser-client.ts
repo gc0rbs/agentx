@@ -521,7 +521,12 @@ export class XBrowserClient {
       await replyBox.click();
       await this.page.keyboard.type(text, { delay: 20 });
 
-      const replyButton = this.page.locator('[data-testid="tweetButton"]');
+      // The inline reply composer under a tweet uses tweetButtonInline, not
+      // tweetButton (that's the full-page /compose/tweet modal's testid) —
+      // match either so a layout change doesn't reintroduce this timeout.
+      const replyButton = this.page
+        .locator('[data-testid="tweetButtonInline"], [data-testid="tweetButton"]')
+        .first();
       await replyButton.waitFor({ state: 'visible' });
       await replyButton.click();
       await this.page.waitForTimeout(2500);
