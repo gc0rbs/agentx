@@ -55,6 +55,11 @@ export class XBrowserClient {
         '--disable-blink-features=AutomationControlled',
         '--no-sandbox',
         '--disable-dev-shm-usage',
+        // x.com over HTTP/2 throws net::ERR_HTTP_RESPONSE_CODE_FAILURE in this
+        // container's network stack even on a direct connection (curl loads
+        // the same URL fine, so this is Chromium/HTTP2-specific, not a block).
+        // Forcing HTTP/1.1 avoids it.
+        '--disable-http2',
       ],
       ...(executablePath ? { executablePath } : {}),
       ...(proxy ? { proxy } : {}),
