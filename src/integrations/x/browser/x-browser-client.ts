@@ -28,6 +28,7 @@ export class XBrowserClient {
   private page: Page | null = null;
   private config: XBrowserConfig;
   private isLoggedIn = false;
+  private pageCrashed = false;
 
   constructor(config: XBrowserConfig = {}) {
     this.config = {
@@ -91,18 +92,48 @@ export class XBrowserClient {
       Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
     });
     this.page = await this.context.newPage();
-    this.page.setDefaultTimeout(this.config.timeout || 30000);
+    this.attachPageHandlers(this.page);
 
     logger.info('Browser initialized');
+  }
+
+  private attachPageHandlers(page: Page): void {
+    page.setDefaultTimeout(this.config.timeout || 30000);
+    // The renderer can crash under sustained navigation (seen after ~24h of
+    // aggressive polling): once crashed, every further goto() on this page
+    // fails identically forever with no self-recovery. Flag it so ensurePage
+    // replaces the page instead of retrying a dead one indefinitely.
+    page.on('crash', () => {
+      logger.error('Page crash event received — will recreate page on next use');
+      this.pageCrashed = true;
+    });
+  }
+
+  /**
+   * Recreate the page (from the same context, so cookies/session survive)
+   * if it crashed or was closed. Call at the start of every page-using method.
+   */
+  private async ensurePage(): Promise<void> {
+    if (!this.context) throw new Error('Browser not initialized');
+    if (!this.page || this.page.isClosed() || this.pageCrashed) {
+      logger.warn('Recovering page (missing, closed, or crashed)', {
+        closed: this.page?.isClosed() ?? true,
+        crashed: this.pageCrashed,
+      });
+      this.page = await this.context.newPage();
+      this.attachPageHandlers(this.page);
+      this.pageCrashed = false;
+    }
   }
 
   /**
    * Login to X
    */
   async login(credentials: XCredentials): Promise<boolean> {
-    if (!this.page) throw new Error('Browser not initialized');
-
     try {
+      await this.ensurePage();
+      if (!this.page) throw new Error('Browser not initialized');
+
       await this.page.goto(LOGIN_URL, { waitUntil: 'domcontentloaded' });
       await this.page.waitForTimeout(2000);
 
@@ -157,9 +188,10 @@ export class XBrowserClient {
    * X's frontend derives the ct0 (CSRF) cookie itself once the session loads.
    */
   async loginWithCookie(authToken: string): Promise<boolean> {
-    if (!this.context || !this.page) throw new Error('Browser not initialized');
-
     try {
+      await this.ensurePage();
+      if (!this.context || !this.page) throw new Error('Browser not initialized');
+
       await this.context.addCookies([
         {
           name: 'auth_token',
@@ -220,9 +252,10 @@ export class XBrowserClient {
    * Check if already logged in (from saved session)
    */
   async checkSession(): Promise<boolean> {
-    if (!this.page) throw new Error('Browser not initialized');
-
     try {
+      await this.ensurePage();
+      if (!this.page) throw new Error('Browser not initialized');
+
       await this.page.goto(X_URL, { waitUntil: 'domcontentloaded' });
       await this.page.waitForTimeout(2000);
 
@@ -282,10 +315,12 @@ export class XBrowserClient {
    * Post a tweet
    */
   async postTweet(text: string, mediaPath?: string): Promise<PostResult> {
-    if (!this.page) throw new Error('Browser not initialized');
     if (!this.isLoggedIn) throw new Error('Not logged in');
 
     try {
+      await this.ensurePage();
+      if (!this.page) throw new Error('Browser not initialized');
+
       await this.page.goto(COMPOSE_URL, { waitUntil: 'domcontentloaded' });
       await this.page.waitForTimeout(1500);
 
@@ -335,12 +370,14 @@ export class XBrowserClient {
    * Post a thread
    */
   async postThread(tweets: TweetData[]): Promise<ThreadResult> {
-    if (!this.page) throw new Error('Browser not initialized');
     if (!this.isLoggedIn) throw new Error('Not logged in');
 
     const results: PostResult[] = [];
 
     try {
+      await this.ensurePage();
+      if (!this.page) throw new Error('Browser not initialized');
+
       await this.page.goto(COMPOSE_URL, { waitUntil: 'domcontentloaded' });
       await this.page.waitForTimeout(1500);
 
@@ -396,10 +433,12 @@ export class XBrowserClient {
    * Get analytics for a tweet from UI
    */
   async getTweetAnalytics(tweetUrl: string): Promise<UIAnalytics | null> {
-    if (!this.page) throw new Error('Browser not initialized');
     if (!this.isLoggedIn) throw new Error('Not logged in');
 
     try {
+      await this.ensurePage();
+      if (!this.page) throw new Error('Browser not initialized');
+
       await this.page.goto(tweetUrl, { waitUntil: 'domcontentloaded' });
       await this.page.waitForTimeout(2000);
 
@@ -457,10 +496,12 @@ export class XBrowserClient {
    * Like a tweet
    */
   async likeTweet(tweetUrl: string): Promise<boolean> {
-    if (!this.page) throw new Error('Browser not initialized');
     if (!this.isLoggedIn) throw new Error('Not logged in');
 
     try {
+      await this.ensurePage();
+      if (!this.page) throw new Error('Browser not initialized');
+
       await this.page.goto(tweetUrl, { waitUntil: 'domcontentloaded' });
       await this.page.waitForTimeout(1500);
 
@@ -480,10 +521,12 @@ export class XBrowserClient {
    * Retweet a tweet
    */
   async retweet(tweetUrl: string): Promise<boolean> {
-    if (!this.page) throw new Error('Browser not initialized');
     if (!this.isLoggedIn) throw new Error('Not logged in');
 
     try {
+      await this.ensurePage();
+      if (!this.page) throw new Error('Browser not initialized');
+
       await this.page.goto(tweetUrl, { waitUntil: 'domcontentloaded' });
       await this.page.waitForTimeout(1500);
 
@@ -508,10 +551,12 @@ export class XBrowserClient {
    * Reply to a tweet
    */
   async replyToTweet(tweetUrl: string, text: string): Promise<PostResult> {
-    if (!this.page) throw new Error('Browser not initialized');
     if (!this.isLoggedIn) throw new Error('Not logged in');
 
     try {
+      await this.ensurePage();
+      if (!this.page) throw new Error('Browser not initialized');
+
       await this.page.goto(tweetUrl, { waitUntil: 'domcontentloaded' });
       await this.page.waitForTimeout(1500);
 
@@ -546,10 +591,12 @@ export class XBrowserClient {
    * Scrape recent mentions from the notifications page
    */
   async getMentions(limit = 20): Promise<Mention[]> {
-    if (!this.page) throw new Error('Browser not initialized');
     if (!this.isLoggedIn) throw new Error('Not logged in');
 
     try {
+      await this.ensurePage();
+      if (!this.page) throw new Error('Browser not initialized');
+
       await this.page.goto('https://x.com/notifications/mentions', {
         waitUntil: 'domcontentloaded',
       });
@@ -600,6 +647,7 @@ export class XBrowserClient {
    * Take screenshot (for debugging)
    */
   async screenshot(path: string): Promise<void> {
+    await this.ensurePage();
     if (!this.page) throw new Error('Browser not initialized');
     await this.page.screenshot({ path, fullPage: true });
   }
